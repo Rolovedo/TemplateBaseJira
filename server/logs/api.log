@@ -2114,3 +2114,41 @@
 [2025-06-11 16:06:47] INFO: GET /api/appointments/get_available_session_by_date?fecha=2025-06-11 304 - 35.258 ms 
 [2025-06-11 16:06:47] INFO: GET /api/appointments/get_available_session_by_date?fecha=2025-06-13 200 - 51.499 ms 
 [2025-06-11 16:06:53] INFO: GET /api/appointments/get_available_session_by_date?fecha=2025-06-11 304 - 35.991 ms 
+[2025-07-23T17:30:49.828Z] [DEBUG] Nueva conexión establecida: 184
+[2025-07-23T17:30:49.841Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T17:39:05.375Z] [DEBUG] Nueva conexión establecida: 186
+[2025-07-23T17:39:05.380Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T17:41:43.419Z] [DEBUG] Nueva conexión establecida: 188
+[2025-07-23T17:41:43.423Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T17:52:49.155Z] [DEBUG] Nueva conexión establecida: 192
+[2025-07-23T17:52:49.161Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T17:55:23.743Z] [DEBUG] Nueva conexión establecida: 194
+[2025-07-23T17:55:23.748Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T18:00:11.041Z] [DEBUG] Nueva conexión establecida: 196
+[2025-07-23T18:00:11.046Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T18:15:54.183Z] [DEBUG] Nueva conexión establecida: 200
+[2025-07-23T18:15:54.190Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T18:28:29.575Z] [DEBUG] Nueva conexión establecida: 212
+[2025-07-23T18:28:29.580Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T19:14:24.049Z] [DEBUG] Nueva conexión establecida: 347
+[2025-07-23T19:14:24.052Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T19:24:34.089Z] [DEBUG] Nueva conexión establecida: 363
+[2025-07-23T19:24:34.092Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T19:31:43.916Z] [DEBUG] Nueva conexión establecida: 22
+[2025-07-23T19:31:43.921Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T19:33:48.527Z] [DEBUG] Nueva conexión establecida: 46
+[2025-07-23T19:33:48.531Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T19:41:15.887Z] [DEBUG] Nueva conexión establecida: 244
+[2025-07-23T19:41:15.891Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T19:50:15.361Z] [DEBUG] Nueva conexión establecida: 247
+[2025-07-23T19:50:15.366Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T19:56:54.438Z] [DEBUG] Nueva conexión establecida: 250
+[2025-07-23T19:56:54.442Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T19:59:30.637Z] [DEBUG] Nueva conexión establecida: 252
+[2025-07-23T19:59:30.641Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T20:04:43.098Z] [DEBUG] Nueva conexión establecida: 285
+[2025-07-23T20:04:43.103Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T20:09:47.989Z] [DEBUG] Nueva conexión establecida: 288
+[2025-07-23T20:09:47.995Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente
+[2025-07-23T20:17:53.429Z] [DEBUG] Nueva conexión establecida: 332
+[2025-07-23T20:17:53.434Z] [SUCCESS] ✅ Conexión a la base de datos establecida correctamente

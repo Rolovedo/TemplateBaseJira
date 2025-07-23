@@ -188,3 +188,12 @@ export const ToastProvider = ({ children }) => {
         </ToastContext.Provider>
     );
 };
+
+// Hook personalizado para usar el contexto de toast
+export const useToast = () => {
+    const context = React.useContext(ToastContext);
+    if (context === undefined) {
+        throw new Error('useToast debe usarse dentro de un ToastProvider');
+    }
+    return context;
+};

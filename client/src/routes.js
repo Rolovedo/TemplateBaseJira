@@ -6,9 +6,21 @@ import Login from "@pages/auth/LoginPage";
 import ResetPassword from "@pages/auth/ResetPassword";
 import NotFoundPage from "@pages/app/NotFoundPage";
 
+// Componentes del Tablero Jira
+import JiraBoard from "@pages/jira/JiraBoard";
+import TaskManagement from "@pages/jira/TaskManagement";
+import DeveloperManagement from "@pages/jira/DeveloperManagement";
+import TaskAssignment from "@pages/jira/TaskAssignment";
+import JiraGuide from "@pages/jira/JiraGuide";
+
 // RUTAS CON LAYOUT
 export const privateAdminRoutes = [
     { path: "/dashboard", component: Dashboard },
+    { path: "/jira-board", component: JiraBoard },
+    { path: "/task-management", component: TaskManagement },
+    { path: "/developer-management", component: DeveloperManagement },
+    { path: "/task-assignment", component: TaskAssignment },
+    { path: "/jira-guide", component: JiraGuide },
     { path: "/reasons", component: Reasons },
     { path: "/profiles", component: Perfiles },
     { path: "/users", component: Usuarios },

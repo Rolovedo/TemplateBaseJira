@@ -1,19 +1,17 @@
-import dotenv from "dotenv";
-import mysql from "mysql2/promise";
+import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Crear el pool de conexiones
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASS || "",
-  database: process.env.DB_DATABASE || "",
-  port: process.env.DB_PORT || 3306,
-  waitForConnections: true, // Espera conexiones si el pool está lleno
-  connectionLimit: 10, // Número máximo de conexiones simultáneas
-  queueLimit: 0, // Sin límite de solicitudes en espera
-  dateStrings: true, // Manejar fechas como strings
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 3306,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    connectionLimit: process.env.DB_CONNECTION_LIMIT || 10,
+    waitForConnections: true,
+    queueLimit: 0
 });
 
 // Función para obtener una conexión
@@ -42,11 +40,11 @@ const testConnection = async () => {
   try {
     connection = await getConnection();
     console.log(
-      `Conexión exitosa a la base de datos ${process.env.DB_DATABASE} en ${process.env.DB_HOST}`
+      `✅ Conexión exitosa a la base de datos ${process.env.DB_NAME} en ${process.env.DB_HOST}`
     );
     await connection.query("SELECT 1"); // Prueba simple
   } catch (error) {
-    console.error("Error en la prueba de conexión:", error);
+    console.error(`❌ Error conectando a la base de datos: | Data: ${error.message}`);
   } finally {
     releaseConnection(connection);
   }

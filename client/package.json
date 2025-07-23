@@ -2,7 +2,7 @@
     "name": "frontend-ponto",
     "version": "1.0.0",
     "private": true,
-    "proxy": "http://localhost:5037",
+    "proxy": "http://localhost:5000",
     "homepage": "https://pavastecnologia.com/ponto/",
     "license": "MIT",
     "dependencies": {
@@ -24,6 +24,7 @@
         "apexcharts": "^3.32.0",
         "axios": "^0.19.0",
         "bootstrap": "^5.1.0",
+        "chart.js": "^3.9.1",
         "classnames": "^2.2.6",
         "date-fns": "^2.28.0",
         "firebase": "^11.0.2",
@@ -42,6 +43,7 @@
         "react-app-polyfill": "^1.0.6",
         "react-barcode": "^1.6.1",
         "react-beautiful-dnd": "^13.1.1",
+        "react-chartjs-2": "^4.3.1",
         "react-clipboard.js": "^2.0.16",
         "react-currency-input-field": "^3.6.4",
         "react-dom": "^17.0.1",
@@ -60,7 +62,7 @@
         "react-toastify": "^8.0.0",
         "react-transition-group": "^4.4.5",
         "react-webcam": "^7.2.0",
-        "sass": "^1.32.8",
+        "sass": "^1.32.13",
         "socket.io-client": "^4.7.5",
         "sprintf-js": "^1.1.2"
     },

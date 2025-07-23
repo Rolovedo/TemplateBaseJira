@@ -11,3 +11,5 @@
 [2025-06-11 08:29:34] ERROR: POST /api/auth/login 500 - 9.037 ms 
 [2025-06-11 09:38:18] ERROR: POST /api/appointments/save_patient_appointment 500 - 106.526 ms 
 [2025-06-11 14:25:42] ERROR: GET /api/appointments/get_available_session_by_date?fecha=2025-06-11 500 - 58982.701 ms 
+[2025-07-23T17:28:28.673Z] [ERROR] ❌ Error conectando a la base de datos: | Data: Unknown database 'tu_base_datos_jira'
+[2025-07-23T17:30:29.382Z] [ERROR] ❌ Error conectando a la base de datos: | Data: Unknown database 'jira_tablas'
