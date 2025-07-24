@@ -330,11 +330,11 @@ CREATE TABLE `tbl_notificaciones` (
 --
 
 INSERT INTO `tbl_notificaciones` (`not_id`, `usu_id`, `not_titulo`, `not_mensaje`, `not_tipo`, `not_visto`, `not_fec_env`, `not_fec_visto`, `not_datos_extra`) VALUES
-(1, 1, 'Bienvenido al sistema Jira', 'Hola Administrador Sistema, bienvenido al sistema de gestión de tareas.', 'success', 0, '2025-07-23 20:17:20', NULL, NULL),
-(2, 2, 'Bienvenido al sistema Jira', 'Hola Juan Pérez, bienvenido al sistema de gestión de tareas.', 'success', 0, '2025-07-23 20:17:20', NULL, NULL),
-(3, 3, 'Bienvenido al sistema Jira', 'Hola María García, bienvenido al sistema de gestión de tareas.', 'success', 0, '2025-07-23 20:17:20', NULL, NULL),
-(4, 4, 'Bienvenido al sistema Jira', 'Hola Carlos López, bienvenido al sistema de gestión de tareas.', 'success', 0, '2025-07-23 20:17:20', NULL, NULL),
-(5, 5, 'Bienvenido al sistema Jira', 'Hola Ana Rodríguez, bienvenido al sistema de gestión de tareas.', 'success', 0, '2025-07-23 20:17:20', NULL, NULL);
+(1, 1, 'Bienvenido al sistema tablero', 'Hola Administrador Sistema, bienvenido al sistema de gestión de tareas.', 'success', 0, '2025-07-23 20:17:20', NULL, NULL),
+(2, 2, 'Bienvenido al sistema tablero', 'Hola Juan Pérez, bienvenido al sistema de gestión de tareas.', 'success', 0, '2025-07-23 20:17:20', NULL, NULL),
+(3, 3, 'Bienvenido al sistema tablero', 'Hola María García, bienvenido al sistema de gestión de tareas.', 'success', 0, '2025-07-23 20:17:20', NULL, NULL),
+(4, 4, 'Bienvenido al sistema tablero', 'Hola Carlos López, bienvenido al sistema de gestión de tareas.', 'success', 0, '2025-07-23 20:17:20', NULL, NULL),
+(5, 5, 'Bienvenido al sistema tablero', 'Hola Ana Rodríguez, bienvenido al sistema de gestión de tareas.', 'success', 0, '2025-07-23 20:17:20', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -449,7 +449,7 @@ CREATE TABLE `tbl_usuarios` (
 --
 
 INSERT INTO `tbl_usuarios` (`usu_id`, `usu_foto`, `usu_nombre`, `usu_apellido`, `usu_correo`, `usu_usuario`, `usu_clave`, `usu_telefono`, `usu_documento`, `est_id`, `prf_id`, `usu_agenda`, `usu_instructor`, `usu_cambio`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, NULL, 'Administrador', 'Sistema', 'admin@jira.com', 'admin', '$2b$10$iN5nL0ZH12EDEeP7LAgibeG6w1OsnkI/PHneTKdP3ZEgphrcAng.K', '1234567890', NULL, 1, 1, 0, 0, 0, '2025-07-23 19:38:58', '2025-07-23 19:38:58'),
+(1, NULL, 'Administrador', 'Sistema', 'admin@tablero.com', 'admin', '$2b$10$iN5nL0ZH12EDEeP7LAgibeG6w1OsnkI/PHneTKdP3ZEgphrcAng.K', '1234567890', NULL, 1, 1, 0, 0, 0, '2025-07-23 19:38:58', '2025-07-23 19:38:58'),
 (2, NULL, 'Juan', 'Pérez', 'juan.perez@empresa.com', 'jperez', '$2b$10$V5Z1BaVEqRywWllKEA2dzechXJiaxzuLtoLIo0pahXHl1aiOFhCBO', '0987654321', NULL, 1, 4, 0, 0, 0, '2025-07-23 19:38:58', '2025-07-23 19:38:58'),
 (3, NULL, 'María', 'García', 'maria.garcia@empresa.com', 'mgarcia', '$2b$10$V5Z1BaVEqRywWllKEA2dzechXJiaxzuLtoLIo0pahXHl1aiOFhCBO', '1122334455', NULL, 1, 3, 0, 0, 0, '2025-07-23 19:38:58', '2025-07-23 19:38:58'),
 (4, NULL, 'Carlos', 'López', 'carlos.lopez@empresa.com', 'clopez', '$2b$10$V5Z1BaVEqRywWllKEA2dzechXJiaxzuLtoLIo0pahXHl1aiOFhCBO', '2233445566', NULL, 1, 4, 0, 0, 0, '2025-07-23 19:38:58', '2025-07-23 19:38:58'),
@@ -529,11 +529,11 @@ CREATE TABLE `tbl_ventanas` (
 
 INSERT INTO `tbl_ventanas` (`ven_id`, `ven_nombre`, `ven_descripcion`, `ven_ruta`, `ven_url`, `ven_icono`, `ven_orden`, `ven_padre`, `est_id`) VALUES
 (1, 'Dashboard', 'Panel principal del sistema', '/dashboard', '/dashboard', 'pi pi-home', 1, 0, 1),
-(2, 'Tablero Jira', 'Tablero visual de tareas estilo Kanban', '/jira/board', '/jira/board', 'pi pi-th-large', 2, 0, 1),
-(3, 'Gestión de Tareas', 'Administración y gestión de tareas', '/jira/tasks', '/jira/tasks', 'pi pi-list', 3, 0, 1),
-(4, 'Asignación de Tareas', 'Asignación de tareas a desarrolladores', '/jira/assignment', '/jira/assignment', 'pi pi-users', 4, 0, 1),
-(5, 'Desarrolladores', 'Gestión de desarrolladores', '/jira/developers', '/jira/developers', 'pi pi-user', 5, 0, 1),
-(6, 'Guía de Uso', 'Reportes y estadísticas', '/jira/guide', '/jira/guide', 'pi pi-question-circle', 6, 0, 1),
+(2, 'Tablero', 'Tablero visual de tareas estilo Kanban', '/tablero/board', '/tablero/board', 'pi pi-th-large', 2, 0, 1),
+(3, 'Gestión de Tareas', 'Administración y gestión de tareas', '/tablero/tasks', '/tablero/tasks', 'pi pi-list', 3, 0, 1),
+(4, 'Asignación de Tareas', 'Asignación de tareas a desarrolladores', '/tablero/assignment', '/tablero/assignment', 'pi pi-users', 4, 0, 1),
+(5, 'Desarrolladores', 'Gestión de desarrolladores', '/tablero/developers', '/tablero/developers', 'pi pi-user', 5, 0, 1),
+(6, 'Guía de Uso', 'Reportes y estadísticas', '/tablero/guide', '/tablero/guide', 'pi pi-question-circle', 6, 0, 1),
 (7, 'Usuarios', 'Configuración del sistema', '/security/users', '/security/users', 'pi pi-user-edit', 7, 0, 1),
 (8, 'Configuración', 'Administración de usuarios', '/admin/settings', '/admin/settings', 'pi pi-cog', 8, 0, 1);
 

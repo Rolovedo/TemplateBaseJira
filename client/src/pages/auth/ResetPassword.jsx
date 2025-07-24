@@ -158,7 +158,7 @@ const ResetPassword = () => {
         <div className="reset-password-container">
             {/* Logotipo superior */}
             <div className="logo-top">
-                <img src={`${process.env.PUBLIC_URL}/images/logos/logo.png`} alt="Top Logo" />
+                <img src={`${process.env.PUBLIC_URL}/images/logos/logoPavasStay.png`} alt="Top Logo" />
             </div>
 
             {/* <div className="icon-container">

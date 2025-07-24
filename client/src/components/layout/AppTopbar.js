@@ -131,9 +131,11 @@ export const AppTopbar = (props) => {
         <div className="layout-topbar">
             <Link to="/" className="layout-topbar-logo">
                 <img
-                    src={`${process.env.PUBLIC_URL}/images/logos/logo.png`}
+                    src={`${process.env.PUBLIC_URL}/images/logos/logoPavasStay.png`}
                     alt="Logo Pavas"
-                    width={10}
+                    width={120}
+                    height="auto"
+                    style={{ maxHeight: '40px', objectFit: 'contain' }}
                 />{" "}
             </Link>
 

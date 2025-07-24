@@ -139,7 +139,7 @@ const Login = () => {
                     <div className="login-form-section">
                         <div className="logos-header">
                             <img
-                                src={`${process.env.PUBLIC_URL}/images/logos/logo.png`}
+                                src={`${process.env.PUBLIC_URL}/images/logos/logoPavasStay.png`}
                                 alt="Logo Cliente"
                                 className="logo-cliente"
                             />

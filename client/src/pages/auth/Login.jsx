@@ -63,7 +63,7 @@ const Login = () => {
                 <div className="login-wrapper">
                     <div className="login-panel">
                         <img
-                            src={`${process.env.PUBLIC_URL}/images/logos/logo.png`}
+                            src={`${process.env.PUBLIC_URL}/images/logos/logoPavasStay.png`}
                             className="login-logo"
                             alt="logo-layout"
                         />
