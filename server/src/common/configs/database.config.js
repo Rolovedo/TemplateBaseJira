@@ -1,4 +1,4 @@
-// Configuración de base de datos para el sistema Jira
+// Configuración de base de datos para el sistema Tablero
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 import { logger } from '../utils/logger.js';

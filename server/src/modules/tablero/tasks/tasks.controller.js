@@ -418,7 +418,7 @@ const sendTaskAssignmentNotification = async (task) => {
             `Prioridad: ${task.priority}\n` +
             `Fecha límite: ${task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No definida'}\n` +
             `Horas estimadas: ${task.estimatedHours}h\n\n` +
-            `Revisa los detalles en el tablero Jira.`;
+            `Revisa los detalles en el tablero.`;
 
         await whatsappService.sendNotification({
             phone: task.assignee.phone,

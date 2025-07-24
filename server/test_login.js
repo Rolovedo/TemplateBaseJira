@@ -69,4 +69,4 @@ async function testLogin(email, password) {
 }
 
 // Probar con el admin
-testLogin('admin@jira.com', 'admin123');
+testLogin('admin@tablero.com', 'admin123');

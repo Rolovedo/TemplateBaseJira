@@ -1,4 +1,4 @@
-// Logger simple para el sistema Jira
+// Logger simple para el sistema del Tablero
 import fs from 'fs';
 import path from 'path';
 

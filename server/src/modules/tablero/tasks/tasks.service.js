@@ -18,11 +18,11 @@ export const getTasks = async (filters = {}) => {
                 GROUP_CONCAT(
                     DISTINCT CONCAT(tc.user_id, ':', u_collab.name, ':', u_collab.email)
                 ) as collaborators
-            FROM jira_tasks t
+            FROM tablero_tasks t
             LEFT JOIN users u_assignee ON t.assignee_id = u_assignee.id
             LEFT JOIN users u_created ON t.created_by = u_created.id
             LEFT JOIN users u_updated ON t.updated_by = u_updated.id
-            LEFT JOIN jira_task_collaborators tc ON t.id = tc.task_id
+            LEFT JOIN tablero_task_collaborators tc ON t.id = tc.task_id
             LEFT JOIN users u_collab ON tc.user_id = u_collab.id
             WHERE 1=1
         `;
@@ -62,7 +62,7 @@ export const getTasks = async (filters = {}) => {
         // Obtener el total para paginación
         let countQuery = `
             SELECT COUNT(DISTINCT t.id) as total
-            FROM jira_tasks t
+            FROM tablero_tasks t
             WHERE 1=1
         `;
         const countParams = params.slice(0, -2); // Remover LIMIT y OFFSET
@@ -104,11 +104,11 @@ export const getTaskById = async (id) => {
                 GROUP_CONCAT(
                     DISTINCT CONCAT(tc.user_id, ':', u_collab.name, ':', u_collab.email)
                 ) as collaborators
-            FROM jira_tasks t
+            FROM tablero_tasks t
             LEFT JOIN users u_assignee ON t.assignee_id = u_assignee.id
             LEFT JOIN users u_created ON t.created_by = u_created.id
             LEFT JOIN users u_updated ON t.updated_by = u_updated.id
-            LEFT JOIN jira_task_collaborators tc ON t.id = tc.task_id
+            LEFT JOIN tablero_task_collaborators tc ON t.id = tc.task_id
             LEFT JOIN users u_collab ON tc.user_id = u_collab.id
             WHERE t.id = ?
             GROUP BY t.id
@@ -151,7 +151,7 @@ export const createTask = async (taskData) => {
         } = taskData;
         
         const query = `
-            INSERT INTO jira_tasks (
+            INSERT INTO tablero_tasks (
                 title, description, assignee_id, priority, status, category,
                 due_date, estimated_hours, required_skills, created_by, created_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -177,7 +177,7 @@ export const createTask = async (taskData) => {
         if (taskData.collaborators && taskData.collaborators.length > 0) {
             for (const collaboratorId of taskData.collaborators) {
                 await connection.execute(
-                    `INSERT INTO jira_task_collaborators (task_id, user_id) VALUES (?, ?)`,
+                    `INSERT INTO tablero_task_collaborators (task_id, user_id) VALUES (?, ?)`,
                     [taskId, collaboratorId]
                 );
             }
@@ -221,7 +221,7 @@ export const updateTask = async (id, taskData) => {
         } = taskData;
         
         const query = `
-            UPDATE jira_tasks SET
+            UPDATE tablero_tasks SET
                 title = ?, description = ?, assignee_id = ?, priority = ?, status = ?,
                 category = ?, due_date = ?, estimated_hours = ?, actual_hours = ?,
                 progress = ?, required_skills = ?, updated_by = ?, updated_at = ?
@@ -253,13 +253,13 @@ export const updateTask = async (id, taskData) => {
         // Actualizar colaboradores si se proporcionan
         if (taskData.collaborators !== undefined) {
             // Eliminar colaboradores existentes
-            await connection.execute(`DELETE FROM jira_task_collaborators WHERE task_id = ?`, [id]);
+            await connection.execute(`DELETE FROM tablero_task_collaborators WHERE task_id = ?`, [id]);
             
             // Agregar nuevos colaboradores
             if (taskData.collaborators.length > 0) {
                 for (const collaboratorId of taskData.collaborators) {
                     await connection.execute(
-                        `INSERT INTO jira_task_collaborators (task_id, user_id) VALUES (?, ?)`,
+                        `INSERT INTO tablero_task_collaborators (task_id, user_id) VALUES (?, ?)`,
                         [id, collaboratorId]
                     );
                 }
@@ -288,10 +288,10 @@ export const deleteTask = async (id) => {
         await connection.beginTransaction();
         
         // Eliminar colaboradores primero
-        await connection.execute(`DELETE FROM jira_task_collaborators WHERE task_id = ?`, [id]);
+        await connection.execute(`DELETE FROM tablero_task_collaborators WHERE task_id = ?`, [id]);
         
         // Eliminar la tarea
-        const [result] = await connection.execute(`DELETE FROM jira_tasks WHERE id = ?`, [id]);
+        const [result] = await connection.execute(`DELETE FROM tablero_tasks WHERE id = ?`, [id]);
         
         await connection.commit();
         
@@ -318,7 +318,7 @@ export const canUserChangeTaskStatus = async (taskId, userId, newStatus) => {
                 t.assignee_id,
                 u.role_id,
                 r.name as role_name
-            FROM jira_tasks t
+            FROM tablero_tasks t
             LEFT JOIN users u ON u.id = ?
             LEFT JOIN roles r ON u.role_id = r.id
             WHERE t.id = ?
@@ -368,7 +368,7 @@ export const updateTaskStatus = async (taskId, status, userId) => {
         connection = await getConnection();
         
         const query = `
-            UPDATE jira_tasks 
+            UPDATE tablero_tasks 
             SET status = ?, updated_by = ?, updated_at = NOW()
             WHERE id = ?
         `;
@@ -417,7 +417,7 @@ export const assignTask = async (taskId, assignmentData) => {
         
         // Actualizar la tarea
         const query = `
-            UPDATE jira_tasks 
+            UPDATE tablero_tasks 
             SET assignee_id = ?, priority = ?, due_date = ?, estimated_hours = ?,
                 status = CASE WHEN status = 'backlog' THEN 'todo' ELSE status END,
                 updated_by = ?, updated_at = ?
@@ -440,13 +440,13 @@ export const assignTask = async (taskId, assignmentData) => {
         }
         
         // Eliminar colaboradores existentes
-        await connection.execute(`DELETE FROM jira_task_collaborators WHERE task_id = ?`, [taskId]);
+        await connection.execute(`DELETE FROM tablero_task_collaborators WHERE task_id = ?`, [taskId]);
         
         // Agregar nuevos colaboradores
         if (collaborators && collaborators.length > 0) {
             for (const collaboratorId of collaborators) {
                 await connection.execute(
-                    `INSERT INTO jira_task_collaborators (task_id, user_id) VALUES (?, ?)`,
+                    `INSERT INTO tablero_task_collaborators (task_id, user_id) VALUES (?, ?)`,
                     [taskId, collaboratorId]
                 );
             }
@@ -455,7 +455,7 @@ export const assignTask = async (taskId, assignmentData) => {
         // Registrar la asignación
         if (notes) {
             await connection.execute(
-                `INSERT INTO jira_task_history (task_id, user_id, action, notes, created_at) 
+                `INSERT INTO tablero_task_history (task_id, user_id, action, notes, created_at) 
                  VALUES (?, ?, 'assigned', ?, ?)`,
                 [taskId, assignedBy, notes, assignedAt]
             );
@@ -482,7 +482,7 @@ const checkDeveloperCapacity = async (developerId, hoursNeeded) => {
         
         // Obtener capacidad máxima del desarrollador
         const [developerRows] = await connection.execute(
-            `SELECT max_capacity FROM jira_developers WHERE user_id = ?`,
+            `SELECT max_capacity FROM tablero_developers WHERE user_id = ?`,
             [developerId]
         );
         
@@ -491,7 +491,7 @@ const checkDeveloperCapacity = async (developerId, hoursNeeded) => {
         // Calcular horas actuales asignadas
         const [workloadRows] = await connection.execute(
             `SELECT COALESCE(SUM(estimated_hours), 0) as current_workload
-             FROM jira_tasks 
+             FROM tablero_tasks 
              WHERE assignee_id = ? AND status IN ('todo', 'inProgress', 'review')`,
             [developerId]
         );
@@ -521,7 +521,7 @@ export const addCollaborator = async (taskId, userId) => {
         
         // Verificar si ya es colaborador
         const [existingRows] = await connection.execute(
-            `SELECT id FROM jira_task_collaborators WHERE task_id = ? AND user_id = ?`,
+            `SELECT id FROM tablero_task_collaborators WHERE task_id = ? AND user_id = ?`,
             [taskId, userId]
         );
         
@@ -530,7 +530,7 @@ export const addCollaborator = async (taskId, userId) => {
         }
         
         await connection.execute(
-            `INSERT INTO jira_task_collaborators (task_id, user_id) VALUES (?, ?)`,
+            `INSERT INTO tablero_task_collaborators (task_id, user_id) VALUES (?, ?)`,
             [taskId, userId]
         );
         
@@ -551,7 +551,7 @@ export const removeCollaborator = async (taskId, userId) => {
         connection = await getConnection();
         
         const [result] = await connection.execute(
-            `DELETE FROM jira_task_collaborators WHERE task_id = ? AND user_id = ?`,
+            `DELETE FROM tablero_task_collaborators WHERE task_id = ? AND user_id = ?`,
             [taskId, userId]
         );
         
@@ -579,7 +579,7 @@ export const getTasksByDeveloper = async (developerId, includeCollaborations = f
             SELECT DISTINCT t.*, 
                    u_assignee.name as assignee_name,
                    u_assignee.email as assignee_email
-            FROM jira_tasks t
+            FROM tablero_tasks t
             LEFT JOIN users u_assignee ON t.assignee_id = u_assignee.id
             WHERE t.assignee_id = ?
         `;
@@ -592,9 +592,9 @@ export const getTasksByDeveloper = async (developerId, includeCollaborations = f
                        u_assignee.name as assignee_name,
                        u_assignee.email as assignee_email,
                        CASE WHEN tc.user_id IS NOT NULL THEN 'collaborator' ELSE 'assignee' END as role_type
-                FROM jira_tasks t
+                FROM tablero_tasks t
                 LEFT JOIN users u_assignee ON t.assignee_id = u_assignee.id
-                LEFT JOIN jira_task_collaborators tc ON t.id = tc.task_id
+                LEFT JOIN tablero_task_collaborators tc ON t.id = tc.task_id
                 WHERE t.assignee_id = ? OR tc.user_id = ?
             `;
             params.push(developerId);
@@ -623,7 +623,7 @@ export const getTasksByStatus = async (status) => {
             SELECT t.*, 
                    u_assignee.name as assignee_name,
                    u_assignee.email as assignee_email
-            FROM jira_tasks t
+            FROM tablero_tasks t
             LEFT JOIN users u_assignee ON t.assignee_id = u_assignee.id
             WHERE t.status = ?
             ORDER BY t.priority DESC, t.created_at DESC
@@ -656,7 +656,7 @@ export const createTaskChangeRequest = async (requestData) => {
         } = requestData;
         
         const query = `
-            INSERT INTO jira_task_change_requests 
+            INSERT INTO tablero_task_change_requests 
             (task_id, user_id, from_status, to_status, reason, status, requested_at)
             VALUES (?, ?, ?, ?, ?, 'pending', ?)
         `;
@@ -677,8 +677,8 @@ export const createTaskChangeRequest = async (requestData) => {
                 t.title as task_title,
                 u.name as user_name,
                 u.phone as user_phone
-            FROM jira_task_change_requests tcr
-            JOIN jira_tasks t ON tcr.task_id = t.id
+            FROM tablero_task_change_requests tcr
+            JOIN tablero_tasks t ON tcr.task_id = t.id
             JOIN users u ON tcr.user_id = u.id
             WHERE tcr.id = ?
         `, [result.insertId]);

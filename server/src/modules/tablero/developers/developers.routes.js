@@ -1,4 +1,4 @@
-// Rutas para gestión de desarrolladores en Jira
+// Rutas para gestión de desarrolladores en el Tablero
 import { Router } from "express";
 import DevelopersController from "./developers.controller.js";
 import { authenticateToken } from "../../../common/middlewares/auth.middleware.js";

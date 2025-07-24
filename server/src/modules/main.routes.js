@@ -18,9 +18,9 @@ import dashboardRoutes from "./reports/dashboard/dahsboard.routes.js";
 import chatAiRoutes from "./admin/ai-chat/chat.routes.js";
 import whatsappRoutes from "./app/whatsapp/whatsapp.routes.js";
 
-// jira
-import jiraTasksRoutes from "./jira/tasks/tasks.routes.js";
-import jiraDevelopersRoutes from "./jira/developers/developers.routes.js";
+// Tablero
+import tableroTasksRoutes from "./tablero/tasks/tasks.routes.js";
+import tableroDevelopersRoutes from "./tablero/developers/developers.routes.js";
 
 const mainRoutes = express.Router();
 
@@ -28,9 +28,9 @@ mainRoutes.use("/template", masterTemplateRoutes);
 mainRoutes.use("/ai-pavas", chatAiRoutes);
 mainRoutes.use("/whatsapp", whatsappRoutes);
 
-// Jira
-mainRoutes.use("/jira/tasks", jiraTasksRoutes);
-mainRoutes.use("/jira/developers", jiraDevelopersRoutes);
+// Tablero
+mainRoutes.use("/tablero/tasks", tableroTasksRoutes);
+mainRoutes.use("/tablero/developers", tableroDevelopersRoutes);
 
 // reports
 mainRoutes.use("/", reportsRoutes);

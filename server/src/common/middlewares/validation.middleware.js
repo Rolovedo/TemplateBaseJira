@@ -1,4 +1,4 @@
-// Middleware de validación para las rutas de Jira
+// Middleware de validación para las rutas de Tablero
 import { validationResult } from "express-validator";
 import { logger } from "../utils/logger.js";
 

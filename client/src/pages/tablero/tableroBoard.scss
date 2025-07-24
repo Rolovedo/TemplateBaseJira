@@ -1,4 +1,4 @@
-.jira-board {
+.tablero-board {
   padding: 20px;
   height: 100vh;
   overflow: hidden;
@@ -176,7 +176,7 @@
 
 // Responsive design
 @media (max-width: 768px) {
-  .jira-board {
+  .tablero-board {
     padding: 10px;
     
     .board-header {

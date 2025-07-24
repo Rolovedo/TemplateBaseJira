@@ -1,4 +1,4 @@
-// Middleware de autenticación para las rutas de Jira
+// Middleware de autenticación para las rutas de Tablero
 import jwt from "jsonwebtoken";
 import { pool } from "../configs/database.config.js";
 import { logger } from "../utils/logger.js";
@@ -84,16 +84,16 @@ export const requireRole = (roles) => {
                 });
             }
 
-            // Verificar si el usuario tiene perfil de desarrollador en Jira
+            // Verificar si el usuario tiene perfil de desarrollador en tablero
             const [developerRows] = await pool.execute(
-                'SELECT rol FROM jira_desarrolladores WHERE usuario_id = ? AND esta_activo = 1',
+                'SELECT rol FROM tablero_desarrolladores WHERE usuario_id = ? AND esta_activo = 1',
                 [req.user.id]
             );
 
             if (developerRows.length === 0) {
                 return res.status(403).json({
                     success: false,
-                    message: 'Usuario sin acceso al sistema Jira'
+                    message: 'Usuario sin acceso al sistema del tablero'
                 });
             }
 
@@ -106,7 +106,7 @@ export const requireRole = (roles) => {
                 });
             }
 
-            req.user.jiraRole = userRole;
+            req.user.tableroRole = userRole;
             next();
 
         } catch (error) {
@@ -133,7 +133,7 @@ export const canModifyTask = async (req, res, next) => {
                 asignado_a, 
                 creado_por,
                 estado
-            FROM jira_tareas 
+            FROM tablero_tareas 
             WHERE id = ?`,
             [taskId]
         );
@@ -146,7 +146,7 @@ export const canModifyTask = async (req, res, next) => {
         }
 
         const task = taskRows[0];
-        const userRole = req.user.jiraRole;
+        const userRole = req.user.tableroRole;
 
         // Verificar permisos
         const canModify = 

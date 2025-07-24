@@ -8,9 +8,9 @@ import { TabView, TabPanel } from 'primereact/tabview';
 // import { Avatar } from 'primereact/avatar';
 import { Chip } from 'primereact/chip';
 import { Timeline } from 'primereact/timeline';
-import './JiraGuide.scss';
+import './tableroGuide.scss';
 
-const JiraGuide = () => {
+const TableroGuide = () => {
     const [activeStep, setActiveStep] = useState(0);
 
     const quickStartSteps = [
@@ -211,7 +211,7 @@ const JiraGuide = () => {
                 return (
                     <Card title="Acceso al Sistema" className="step-card">
                         <div className="step-content">
-                            <p>Para comenzar a usar el tablero Jira:</p>
+                            <p>Para comenzar a usar el tablero:</p>
                             <ol>
                                 <li>Visita la URL del sistema proporcionada por tu administrador</li>
                                 <li>Ingresa tu email y contraseña asignados</li>
@@ -340,9 +340,9 @@ const JiraGuide = () => {
     };
 
     return (
-        <div className="jira-guide">
+        <div className="tablero-guide">
             <div className="guide-header">
-                <h1>Guía de Usuario - Tablero Jira</h1>
+                <h1>Guía de Usuario - Tablero</h1>
                 <p>Aprende a usar el sistema de gestión de tareas de manera efectiva</p>
             </div>
 
@@ -526,4 +526,4 @@ const JiraGuide = () => {
     );
 };
 
-export default JiraGuide;
+export default TableroGuide;

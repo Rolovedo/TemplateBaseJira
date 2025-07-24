@@ -13,9 +13,9 @@ import { confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useToast } from '@context/toast/ToastContext';
-import './JiraBoard.scss';
+import './tableroBoard.scss';
 
-const JiraBoard = () => {
+const TableroBoard = () => {
     const { showToast } = useToast();
     const [tasks, setTasks] = useState({
         backlog: [],
@@ -66,7 +66,7 @@ const JiraBoard = () => {
     const loadTasks = useCallback(async () => {
         try {
             // Aquí cargarías las tareas desde la API
-            // const response = await fetch('/api/jira/tasks');
+            // const response = await fetch('/api/tablero/tasks');
             // const data = await response.json();
             // setTasks(data);
             
@@ -99,7 +99,7 @@ const JiraBoard = () => {
 
     const loadDevelopers = useCallback(async () => {
         try {
-            // Aquí cargarías los desarrolladores desde la API
+            // Aquí se cargan los desarrolladores desde la API
             setDevelopers([
                 { id: 1, name: 'Juan Pérez', avatar: 'JP', role: 'Frontend Developer' },
                 { id: 2, name: 'María García', avatar: 'MG', role: 'Backend Developer' },
@@ -188,7 +188,7 @@ const JiraBoard = () => {
 
     const updateTaskStatus = async (taskId, newStatus) => {
         try {
-            // await fetch(`/api/jira/tasks/${taskId}/status`, {
+            // await fetch(`/api/tablero/tasks/${taskId}/status`, {
             //     method: 'PUT',
             //     headers: { 'Content-Type': 'application/json' },
             //     body: JSON.stringify({ status: newStatus })
@@ -286,7 +286,7 @@ const JiraBoard = () => {
     );
 
     return (
-        <div className="jira-board">
+        <div className="tablero-board">
             <div className="board-header">
                 <h2>Tablero de Desarrollo</h2>
                 <div className="header-actions">
@@ -294,7 +294,7 @@ const JiraBoard = () => {
                         icon="pi pi-question-circle" 
                         label="Guía de Uso" 
                         className="p-button-outlined p-button-info"
-                        onClick={() => window.open('/jira-guide', '_blank')}
+                        onClick={() => window.open('/tablero-guide', '_blank')}
                     />
                     <Button 
                         icon="pi pi-plus" 
@@ -468,4 +468,4 @@ const JiraBoard = () => {
     );
 };
 
-export default JiraBoard;
+export default TableroBoard;

@@ -141,7 +141,7 @@ class WhatsAppNotificationService {
             } = data;
 
             const query = `
-                INSERT INTO jira_whatsapp_notifications (
+                INSERT INTO tablero_whatsapp_notifications (
                     task_id, change_request_id, recipient_phone, 
                     message, type, status, created_at
                 ) VALUES (?, ?, ?, ?, ?, 'pending', NOW())
@@ -169,7 +169,7 @@ class WhatsAppNotificationService {
     async updateNotificationStatus(notificationId, status) {
         try {
             const query = `
-                UPDATE jira_whatsapp_notifications 
+                UPDATE tablero_whatsapp_notifications 
                 SET status = ?, sent_at = CASE WHEN ? = 'sent' THEN NOW() ELSE sent_at END
                 WHERE id = ?
             `;
@@ -189,7 +189,7 @@ class WhatsAppNotificationService {
         try {
             const query = `
                 SELECT setting_value 
-                FROM jira_settings 
+                FROM tablero_settings 
                 WHERE setting_key = 'supervisor_phone'
             `;
 
@@ -213,7 +213,7 @@ class WhatsAppNotificationService {
                     t.status as current_status,
                     t.priority,
                     u.name as developer_name
-                FROM jira_tasks t
+                FROM tablero_tasks t
                 JOIN users u ON u.id = ?
                 WHERE t.id = ?
             `;
@@ -260,7 +260,7 @@ ${changeRequest.reason}
 
 ⏰ *Fecha solicitud:* ${new Date(changeRequest.requested_at).toLocaleString('es-CO')}
 
-Por favor, revisa y aprueba/rechaza esta solicitud en el sistema Jira.`;
+Por favor, revisa y aprueba/rechaza esta solicitud en el sistema del tablero.`;
     }
 
     /**
@@ -287,7 +287,7 @@ ${priorityEmoji[task.priority] || '⚪'} *Prioridad:* ${task.priority.toUpperCas
 
 ${task.description ? `📄 *Descripción:*\n${task.description}` : ''}
 
-¡Por favor, revisa los detalles en el sistema Jira!`;
+¡Por favor, revisa los detalles en el sistema del tablero!`;
     }
 
     /**
@@ -359,9 +359,9 @@ Por favor, actualiza el estado o contacta con tu supervisor.`;
                     n.*,
                     t.title as task_title,
                     cr.reason as change_reason
-                FROM jira_whatsapp_notifications n
-                LEFT JOIN jira_tasks t ON n.task_id = t.id
-                LEFT JOIN jira_task_change_requests cr ON n.change_request_id = cr.id
+                FROM tablero_whatsapp_notifications n
+                LEFT JOIN tablero_tasks t ON n.task_id = t.id
+                LEFT JOIN tablero_task_change_requests cr ON n.change_request_id = cr.id
                 WHERE 1=1
             `;
 
@@ -404,7 +404,7 @@ Por favor, actualiza el estado o contacta con tu supervisor.`;
     async retryFailedNotification(notificationId) {
         try {
             const query = `
-                SELECT * FROM jira_whatsapp_notifications 
+                SELECT * FROM tablero_whatsapp_notifications 
                 WHERE id = ? AND status = 'failed'
             `;
 

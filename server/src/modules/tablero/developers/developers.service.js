@@ -1,4 +1,4 @@
-// Servicio para gestión de desarrolladores en el sistema Jira
+// Servicio para gestión de desarrolladores en el sistema del Tablero
 import { pool } from '../../../common/configs/database.config.js';
 import { logger } from '../../../common/utils/logger.js';
 
@@ -20,9 +20,9 @@ class DevelopersService {
                     ds.current_workload,
                     ds.workload_percentage,
                     ds.avg_completion_time
-                FROM jira_developers d
+                FROM tablero_developers d
                 JOIN users u ON d.user_id = u.id
-                LEFT JOIN jira_developer_stats ds ON d.user_id = ds.user_id
+                LEFT JOIN tablero_developer_stats ds ON d.user_id = ds.user_id
                 WHERE d.is_active = TRUE
             `;
 
@@ -74,9 +74,9 @@ class DevelopersService {
                     ds.current_workload,
                     ds.workload_percentage,
                     ds.avg_completion_time
-                FROM jira_developers d
+                FROM tablero_developers d
                 JOIN users u ON d.user_id = u.id
-                LEFT JOIN jira_developer_stats ds ON d.user_id = ds.user_id
+                LEFT JOIN tablero_developer_stats ds ON d.user_id = ds.user_id
                 WHERE d.user_id = ?
             `;
 
@@ -117,7 +117,7 @@ class DevelopersService {
             } = developerData;
 
             const query = `
-                INSERT INTO jira_developers (
+                INSERT INTO tablero_developers (
                     user_id, role, level, skills, max_capacity, 
                     efficiency_rating, avatar, phone
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -165,14 +165,14 @@ class DevelopersService {
             const queries = {
                 totalDevelopers: `
                     SELECT COUNT(*) as count 
-                    FROM jira_developers 
+                    FROM tablero_developers 
                     WHERE is_active = TRUE
                 `,
                 taskDistribution: `
                     SELECT 
                         status,
                         COUNT(*) as count
-                    FROM jira_tasks
+                    FROM tablero_tasks
                     GROUP BY status
                 `,
                 workloadDistribution: `
@@ -184,14 +184,14 @@ class DevelopersService {
                             ELSE 'Disponible'
                         END as workload_level,
                         COUNT(*) as count
-                    FROM jira_developer_stats
+                    FROM tablero_developer_stats
                     GROUP BY workload_level
                 `,
                 levelDistribution: `
                     SELECT 
                         level,
                         COUNT(*) as count
-                    FROM jira_developers
+                    FROM tablero_developers
                     WHERE is_active = TRUE
                     GROUP BY level
                 `,
@@ -201,9 +201,9 @@ class DevelopersService {
                         d.level,
                         ds.completed_tasks,
                         ds.avg_completion_time
-                    FROM jira_developers d
+                    FROM tablero_developers d
                     JOIN users u ON d.user_id = u.id
-                    LEFT JOIN jira_developer_stats ds ON d.user_id = ds.user_id
+                    LEFT JOIN tablero_developer_stats ds ON d.user_id = ds.user_id
                     WHERE d.is_active = TRUE AND ds.completed_tasks > 0
                     ORDER BY ds.completed_tasks DESC, ds.avg_completion_time ASC
                     LIMIT 5
@@ -254,9 +254,9 @@ class DevelopersService {
                             ELSE 50
                         END) * 0.3
                     ) as recommendation_score
-                FROM jira_developers d
+                FROM tablero_developers d
                 JOIN users u ON d.user_id = u.id
-                LEFT JOIN jira_developer_stats ds ON d.user_id = ds.user_id
+                LEFT JOIN tablero_developer_stats ds ON d.user_id = ds.user_id
                 WHERE d.is_active = TRUE
                     AND (ds.current_workload + ?) <= d.max_capacity
             `;
@@ -299,8 +299,8 @@ class DevelopersService {
                     d.max_capacity,
                     COALESCE(ds.current_workload, 0) as current_workload,
                     (d.max_capacity - COALESCE(ds.current_workload, 0) - ?) as available_hours
-                FROM jira_developers d
-                LEFT JOIN jira_developer_stats ds ON d.user_id = ds.user_id
+                FROM tablero_developers d
+                LEFT JOIN tablero_developer_stats ds ON d.user_id = ds.user_id
                 WHERE d.user_id = ? AND d.is_active = TRUE
             `;
 
@@ -337,14 +337,14 @@ class DevelopersService {
 
             // Desasignar tareas activas
             await connection.execute(`
-                UPDATE jira_tasks 
+                UPDATE tablero_tasks 
                 SET assignee_id = NULL, updated_at = CURRENT_TIMESTAMP
                 WHERE assignee_id = ? AND status IN ('todo', 'inProgress', 'review')
             `, [userId]);
 
             // Desactivar desarrollador
             await connection.execute(`
-                UPDATE jira_developers 
+                UPDATE tablero_developers 
                 SET is_active = FALSE, updated_at = CURRENT_TIMESTAMP
                 WHERE user_id = ?
             `, [userId]);
@@ -373,8 +373,8 @@ class DevelopersService {
                     th.action,
                     th.created_at as history_date,
                     th.notes
-                FROM jira_task_history th
-                JOIN jira_tasks t ON th.task_id = t.id
+                FROM tablero_task_history th
+                JOIN tablero_tasks t ON th.task_id = t.id
                 WHERE th.user_id = ?
                 ORDER BY th.created_at DESC
                 LIMIT ?

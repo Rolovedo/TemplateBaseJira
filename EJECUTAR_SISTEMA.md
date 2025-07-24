@@ -1,4 +1,4 @@
-# Guía para Ejecutar Backend y Frontend - Sistema Jira
+# Guía para Ejecutar Backend y Frontend - Sistema tablero
 
 ## 📋 Requisitos Previos
 
@@ -135,7 +135,7 @@ cd client
 npm install
 ```
 
-### Paso 4: Verificar dependencias adicionales para Jira
+### Paso 4: Verificar dependencias adicionales para tablero
 Verificar que estas dependencias estén en `package.json`:
 ```json
 {
@@ -163,25 +163,25 @@ npm install react-beautiful-dnd react-router-dom chart.js react-chartjs-2
 # Crear archivo .env
 REACT_APP_API_URL=http://localhost:5000/api
 REACT_APP_ENVIRONMENT=development
-REACT_APP_APP_NAME=Sistema Jira
+REACT_APP_APP_NAME=Sistema tablero
 ```
 
 ### Paso 6: Verificar archivo `src/routes.js`
-Confirmar que incluye las rutas de Jira:
+Confirmar que incluye las rutas de tablero:
 ```javascript
-// Importaciones Jira
-import JiraBoard from './pages/jira/JiraBoard';
-import TaskManagement from './pages/jira/TaskManagement';
-import DeveloperManagement from './pages/jira/DeveloperManagement';
-import TaskAssignment from './pages/jira/TaskAssignment';
-import JiraGuide from './pages/jira/JiraGuide';
+// Importaciones tablero
+import tableroBoard from './pages/tablero/tableroBoard';
+import TaskManagement from './pages/tablero/TaskManagement';
+import DeveloperManagement from './pages/tablero/DeveloperManagement';
+import TaskAssignment from './pages/tablero/TaskAssignment';
+import tableroGuide from './pages/tablero/tableroGuide';
 
-// Rutas Jira
-{ path: '/jira/board', component: JiraBoard },
-{ path: '/jira/tasks', component: TaskManagement },
-{ path: '/jira/developers', component: DeveloperManagement },
-{ path: '/jira/assignment', component: TaskAssignment },
-{ path: '/jira/guide', component: JiraGuide },
+// Rutas tablero
+{ path: '/tablero/board', component: tableroBoard },
+{ path: '/tablero/tasks', component: TaskManagement },
+{ path: '/tablero/developers', component: DeveloperManagement },
+{ path: '/tablero/assignment', component: TaskAssignment },
+{ path: '/tablero/guide', component: tableroGuide },
 ```
 
 ### Paso 7: Ejecutar el frontend
@@ -193,28 +193,28 @@ npm start
 ### Paso 8: Verificar que el frontend funciona
 - ✅ Browser abre automáticamente en `http://localhost:3000`
 - ✅ Aplicación carga sin errores
-- ✅ Menu de navegación muestra opciones de Jira
+- ✅ Menu de navegación muestra opciones de tablero
 
 ---
 
 ## 🔄 PARTE 3: VERIFICAR INTEGRACIÓN COMPLETA
 
-### Paso 1: Probar navegación a Jira
+### Paso 1: Probar navegación a tablero
 1. Ir a `http://localhost:3000`
 2. Login con usuario existente
-3. Navegar a secciones Jira:
-   - `/jira/board` - Tablero Kanban
-   - `/jira/tasks` - Gestión de Tareas
-   - `/jira/developers` - Gestión de Desarrolladores
-   - `/jira/assignment` - Asignación de Tareas
-   - `/jira/guide` - Guía de Usuario
+3. Navegar a secciones tablero:
+   - `/tablero/board` - Tablero Kanban
+   - `/tablero/tasks` - Gestión de Tareas
+   - `/tablero/developers` - Gestión de Desarrolladores
+   - `/tablero/assignment` - Asignación de Tareas
+   - `/tablero/guide` - Guía de Usuario
 
 ### Paso 2: Probar APIs del backend
 Usar Postman o navegador para probar:
 ```
-GET  http://localhost:5000/api/jira/tasks
-GET  http://localhost:5000/api/jira/developers
-POST http://localhost:5000/api/jira/tasks
+GET  http://localhost:5000/api/tablero/tasks
+GET  http://localhost:5000/api/tablero/developers
+POST http://localhost:5000/api/tablero/tasks
 ```
 
 ### Paso 3: Verificar logs
@@ -285,10 +285,10 @@ app.use(cors({
 }));
 ```
 
-### Error: "Cannot read property of undefined" en componentes Jira
+### Error: "Cannot read property of undefined" en componentes tablero
 Verificar que:
-1. ✅ Todas las páginas Jira existen en `client/src/pages/jira/`
-2. ✅ Los estilos SCSS existen en `client/src/pages/jira/styles/`
+1. ✅ Todas las páginas tablero existen en `client/src/pages/tablero/`
+2. ✅ Los estilos SCSS existen en `client/src/pages/tablero/styles/`
 3. ✅ Las rutas están correctamente configuradas
 
 ---
@@ -342,7 +342,7 @@ npm start
 
 ### Backend ✅
 - [ ] MySQL corriendo
-- [ ] Base de datos Jira instalada
+- [ ] Base de datos tablero instalada
 - [ ] Archivo `.env` configurado
 - [ ] `npm install` ejecutado
 - [ ] Servidor corriendo en puerto 5000
@@ -351,10 +351,10 @@ npm start
 ### Frontend ✅
 - [ ] Dependencias instaladas
 - [ ] Archivo `.env` configurado
-- [ ] Rutas Jira configuradas
+- [ ] Rutas tablero configuradas
 - [ ] Aplicación corriendo en puerto 3000
 - [ ] Sin errores en consola
-- [ ] Navegación a páginas Jira funciona
+- [ ] Navegación a páginas tablero funciona
 
 ### Integración ✅
 - [ ] Frontend conecta con Backend
@@ -365,4 +365,4 @@ npm start
 
 ---
 
-¡Una vez completados todos los pasos, tu sistema Jira estará completamente funcional! 🎉
+¡Una vez completados todos los pasos, tu sistema tablero estará completamente funcional! 🎉
