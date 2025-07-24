@@ -232,7 +232,7 @@ const Login = () => {
                             style={{
                                 width: "100%",
                                 height: "100%",
-                                backgroundImage: `url(${process.env.PUBLIC_URL}/images/bgLoginPage.jpg)`,
+                                backgroundImage: `url(${process.env.PUBLIC_URL}/images/bgDashboard.svg)`,
                                 backgroundSize: "cover",
                                 backgroundPosition: "center",
                                 borderRadius: "16px",

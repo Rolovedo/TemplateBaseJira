@@ -8,6 +8,7 @@ import NotFoundPage from "@pages/app/NotFoundPage";
 
 // Componentes del Tablero
 import TableroBoard from "@pages/tablero/tableroBoard";
+import TableroTest from "@pages/tablero/tableroTest";
 import TaskManagement from "@pages/tablero/TaskManagement";
 import DeveloperManagement from "@pages/tablero/DeveloperManagement";
 import TaskAssignment from "@pages/tablero/TaskAssignment";
@@ -16,14 +17,14 @@ import TableroGuide from "@pages/tablero/tableroGuide";
 // RUTAS CON LAYOUT
 export const privateAdminRoutes = [
     { path: "/dashboard", component: Dashboard },
-    { path: "/tablero-board", component: TableroBoard },
-    { path: "/task-management", component: TaskManagement },
-    { path: "/developer-management", component: DeveloperManagement },
-    { path: "/task-assignment", component: TaskAssignment },
-    { path: "/tablero-guide", component: TableroGuide },
-    { path: "/reasons", component: Reasons },
-    { path: "/profiles", component: Perfiles },
-    { path: "/users", component: Usuarios },
+    { path: "/tablero/board", component: TableroTest }, // Usando componente de prueba
+    { path: "/tablero/tasks", component: TaskManagement },
+    { path: "/tablero/developers", component: DeveloperManagement },
+    { path: "/tablero/assignment", component: TaskAssignment },
+    { path: "/tablero/guide", component: TableroGuide },
+    { path: "/admin/reasons", component: Reasons },
+    { path: "/security/profiles", component: Perfiles },
+    { path: "/security/users", component: Usuarios },
 ];
 
 // RUTAS SIN LAYOUT

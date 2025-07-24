@@ -3621,10 +3621,10 @@
     padding: 1.25rem;
 }
 
-.fc {
+/*.fc {
     /* FullCalendar 4 */
     /* FullCalendar 5 */
-}
+/*}*/
 
 .fc.fc-unthemed .fc-view-container th {
     background: #fff;
@@ -3637,9 +3637,9 @@
     color: #495057;
 }
 
-.fc.fc-unthemed .fc-view-container td.fc-head-container {
+/*.fc.fc-unthemed .fc-view-container td.fc-head-container {
     /* border: 1px solid #dee2e6; */
-}
+/*}*/
 
 .fc.fc-unthemed .fc-view-container .fc-view {
     background: #ffffff;

@@ -528,14 +528,14 @@ CREATE TABLE `tbl_ventanas` (
 --
 
 INSERT INTO `tbl_ventanas` (`ven_id`, `ven_nombre`, `ven_descripcion`, `ven_ruta`, `ven_url`, `ven_icono`, `ven_orden`, `ven_padre`, `est_id`) VALUES
-(1, 'Dashboard', 'Panel principal del sistema', '/dashboard', '/dashboard', 'pi pi-home', 1, 0, 1),
-(2, 'Tablero', 'Tablero visual de tareas estilo Kanban', '/tablero/board', '/tablero/board', 'pi pi-th-large', 2, 0, 1),
-(3, 'Gestión de Tareas', 'Administración y gestión de tareas', '/tablero/tasks', '/tablero/tasks', 'pi pi-list', 3, 0, 1),
-(4, 'Asignación de Tareas', 'Asignación de tareas a desarrolladores', '/tablero/assignment', '/tablero/assignment', 'pi pi-users', 4, 0, 1),
-(5, 'Desarrolladores', 'Gestión de desarrolladores', '/tablero/developers', '/tablero/developers', 'pi pi-user', 5, 0, 1),
-(6, 'Guía de Uso', 'Reportes y estadísticas', '/tablero/guide', '/tablero/guide', 'pi pi-question-circle', 6, 0, 1),
-(7, 'Usuarios', 'Configuración del sistema', '/security/users', '/security/users', 'pi pi-user-edit', 7, 0, 1),
-(8, 'Configuración', 'Administración de usuarios', '/admin/settings', '/admin/settings', 'pi pi-cog', 8, 0, 1);
+(1, 'Dashboard', 'Panel principal del sistema', 'dashboard', 'dashboard', 'pi pi-home', 1, 0, 1),
+(2, 'Tablero', 'Tablero visual de tareas estilo Kanban', 'tablero/board', 'tablero/board', 'pi pi-th-large', 2, 0, 1),
+(3, 'Gestión de Tareas', 'Administración y gestión de tareas', 'tablero/tasks', 'tablero/tasks', 'pi pi-list', 3, 0, 1),
+(4, 'Asignación de Tareas', 'Asignación de tareas a desarrolladores', 'tablero/assignment', 'tablero/assignment', 'pi pi-users', 4, 0, 1),
+(5, 'Desarrolladores', 'Gestión de desarrolladores', 'tablero/developers', 'tablero/developers', 'pi pi-user', 5, 0, 1),
+(6, 'Guía de Uso', 'Reportes y estadísticas', 'tablero/guide', 'tablero/guide', 'pi pi-question-circle', 6, 0, 1),
+(7, 'Usuarios', 'Configuración del sistema', 'security/users', 'security/users', 'pi pi-user-edit', 7, 0, 1),
+(8, 'Configuración', 'Administración de usuarios', 'admin/settings', 'admin/settings', 'pi pi-cog', 8, 0, 1);
 
 -- --------------------------------------------------------
 

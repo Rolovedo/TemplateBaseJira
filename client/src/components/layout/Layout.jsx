@@ -71,6 +71,12 @@ const Layout = ({ children }) => {
                 });
 
                 setMenu(menur);
+                
+                // Activar automáticamente el botón del tablero después de cargar el menú
+                setTimeout(() => {
+                    activateTableroButton();
+                }, 500); // Esperar 500ms para que el DOM se actualice
+                
             } catch (error) {
                 handleApiError(error);
             }
@@ -84,6 +90,96 @@ const Layout = ({ children }) => {
     useEffect(() => {
         copyTooltipRef && copyTooltipRef.current && copyTooltipRef.current.updateTargetEvents();
     }, [location]);
+
+    // Función para activar automáticamente el botón del tablero
+    const activateTableroButton = () => {
+        try {
+            // Encontrar el elemento del tablero
+            const menuContainer = document.querySelector('.layout-menu-container');
+            if (!menuContainer) return;
+            
+            const tableroCategory = Array.from(menuContainer.querySelectorAll('.layout-menuitem-category'))
+                .find(category => category.textContent.toLowerCase().includes('tablero'));
+            
+            if (!tableroCategory) return;
+            
+            // Hacer clickeable el título
+            const tableroTitle = tableroCategory.querySelector('.layout-menuitem-root-text');
+            if (tableroTitle && !tableroTitle.hasAttribute('data-tablero-activated')) {
+                // Marcar como activado para evitar duplicados
+                tableroTitle.setAttribute('data-tablero-activated', 'true');
+                
+                // Estilos visuales
+                tableroTitle.style.cursor = "pointer";
+                tableroTitle.style.padding = "10px";
+                tableroTitle.style.borderRadius = "5px";
+                tableroTitle.style.transition = "all 0.3s ease";
+                
+                // Evento de click
+                tableroTitle.onclick = function(e) {
+                    e.preventDefault();
+                    window.location.hash = '#/tablero/board';
+                };
+                
+                // Efectos hover
+                tableroTitle.onmouseenter = function() {
+                    this.style.backgroundColor = "#007bff";
+                    this.style.color = "white";
+                    this.style.transform = "translateX(5px)";
+                };
+                
+                tableroTitle.onmouseleave = function() {
+                    this.style.backgroundColor = "";
+                    this.style.color = "";
+                    this.style.transform = "translateX(0)";
+                };
+            }
+            
+            // Agregar enlace en el submenu si está vacío
+            const submenu = tableroCategory.querySelector('.layout-submenu-fixed');
+            if (submenu && submenu.children.length === 0 && !submenu.hasAttribute('data-tablero-link-added')) {
+                submenu.setAttribute('data-tablero-link-added', 'true');
+                
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                
+                link.href = '#/tablero/board';
+                link.innerHTML = `
+                    <div style="padding: 10px; display: flex; align-items: center; gap: 10px; color: #007bff;">
+                        <i class="pi pi-th-large"></i>
+                        <span>Tablero Kanban</span>
+                    </div>
+                `;
+                
+                link.style.textDecoration = "none";
+                link.style.borderRadius = "5px";
+                link.style.margin = "5px";
+                link.style.display = "block";
+                link.style.transition = "all 0.3s ease";
+                
+                // Efectos hover para el enlace
+                link.onmouseenter = function() {
+                    this.style.backgroundColor = "#f0f8ff";
+                    this.style.transform = "translateX(5px)";
+                };
+                
+                link.onmouseleave = function() {
+                    this.style.backgroundColor = "";
+                    this.style.transform = "translateX(0)";
+                };
+                
+                link.onclick = function(e) {
+                    e.preventDefault();
+                    window.location.hash = '#/tablero/board';
+                };
+                
+                listItem.appendChild(link);
+                submenu.appendChild(listItem);
+            }
+        } catch (error) {
+            console.log('Error activando botón del tablero:', error);
+        }
+    };
 
     const onInputStyleChange = (inputStyle) => {
         setInputStyle(inputStyle);

@@ -70,13 +70,13 @@ const TableroBoard = () => {
             // const data = await response.json();
             // setTasks(data);
             
-            // Datos de ejemplo
+            // Datos de ejemplo más llamativos
             setTasks({
                 backlog: [
                     {
                         id: '1',
-                        title: 'Implementar autenticación',
-                        description: 'Crear sistema de login y registro',
+                        title: '🔐 Implementar autenticación',
+                        description: 'Crear sistema de login y registro de usuarios',
                         assignee: { id: 1, name: 'Juan Pérez', avatar: 'JP' },
                         priority: 'high',
                         dueDate: new Date('2024-08-15'),
@@ -84,12 +84,63 @@ const TableroBoard = () => {
                         estimatedHours: 16,
                         createdDate: new Date(),
                         collaborators: []
+                    },
+                    {
+                        id: '2',
+                        title: '🎨 Diseñar interfaz principal',
+                        description: 'Crear el diseño de la página principal del dashboard',
+                        assignee: { id: 2, name: 'María García', avatar: 'MG' },
+                        priority: 'medium',
+                        dueDate: new Date('2024-08-20'),
+                        category: 'frontend',
+                        estimatedHours: 12,
+                        createdDate: new Date(),
+                        collaborators: []
                     }
                 ],
-                todo: [],
-                inProgress: [],
+                todo: [
+                    {
+                        id: '3',
+                        title: '📊 Configurar base de datos',
+                        description: 'Configurar las tablas y relaciones de la base de datos',
+                        assignee: { id: 3, name: 'Carlos López', avatar: 'CL' },
+                        priority: 'very-high',
+                        dueDate: new Date('2024-08-10'),
+                        category: 'database',
+                        estimatedHours: 8,
+                        createdDate: new Date(),
+                        collaborators: []
+                    }
+                ],
+                inProgress: [
+                    {
+                        id: '4',
+                        title: '🔧 Desarrollo de API REST',
+                        description: 'Implementar endpoints para el manejo de datos',
+                        assignee: { id: 1, name: 'Juan Pérez', avatar: 'JP' },
+                        priority: 'high',
+                        dueDate: new Date('2024-08-18'),
+                        category: 'backend',
+                        estimatedHours: 20,
+                        createdDate: new Date(),
+                        collaborators: []
+                    }
+                ],
                 review: [],
-                done: []
+                done: [
+                    {
+                        id: '5',
+                        title: '✅ Configuración inicial del proyecto',
+                        description: 'Configurar estructura de carpetas y dependencias',
+                        assignee: { id: 3, name: 'Carlos López', avatar: 'CL' },
+                        priority: 'medium',
+                        dueDate: new Date('2024-08-05'),
+                        category: 'devops',
+                        estimatedHours: 4,
+                        createdDate: new Date(),
+                        collaborators: []
+                    }
+                ]
             });
         } catch (error) {
             console.error('Error loading tasks:', error);
@@ -111,6 +162,11 @@ const TableroBoard = () => {
     }, []);
 
     useEffect(() => {
+        // Indicador visual en consola
+        console.log("🎯 TABLERO KANBAN CARGADO EXITOSAMENTE!");
+        console.log("📊 Componente TableroBoard renderizado correctamente");
+        console.log("✅ Si ves este mensaje, el tablero está funcionando");
+        
         loadTasks();
         loadDevelopers();
     }, [loadTasks, loadDevelopers]);
@@ -287,8 +343,23 @@ const TableroBoard = () => {
 
     return (
         <div className="tablero-board">
+            {/* Banner de confirmación visual */}
+            <div className="tablero-banner">
+                <div className="banner-content">
+                    <i className="pi pi-check-circle banner-icon"></i>
+                    <div className="banner-text">
+                        <h3>¡Tablero Kanban Funcionando!</h3>
+                        <p>El tablero se está cargando correctamente. Si ves este mensaje, ¡la navegación está funcionando!</p>
+                    </div>
+                </div>
+            </div>
+            
             <div className="board-header">
-                <h2>Tablero de Desarrollo</h2>
+                <div className="header-title">
+                    <i className="pi pi-th-large header-icon"></i>
+                    <h2>Tablero de Desarrollo</h2>
+                    <Badge value="ACTIVO" severity="success" className="status-badge" />
+                </div>
                 <div className="header-actions">
                     <Button 
                         icon="pi pi-question-circle" 
