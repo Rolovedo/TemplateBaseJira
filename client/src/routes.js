@@ -1,37 +1,26 @@
-import Dashboard from "@pages/home/Dashboard";
-import Reasons from "@pages/admin/Reasons";
-import Perfiles from "@pages/security/Perfiles";
-import Usuarios from "@pages/security/Usuarios";
-import Login from "@pages/auth/LoginPage";
-import ResetPassword from "@pages/auth/ResetPassword";
-import NotFoundPage from "@pages/app/NotFoundPage";
+import React from 'react';
+import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import LoginPage from './pages/auth/LoginPage';
+import TableroBoard from './pages/tablero/tableroBoard';
 
-// Componentes del Tablero
-import TableroBoard from "@pages/tablero/tableroBoard";
-import TableroTest from "@pages/tablero/tableroTest";
-import TaskManagement from "@pages/tablero/TaskManagement";
-import DeveloperManagement from "@pages/tablero/DeveloperManagement";
-import TaskAssignment from "@pages/tablero/TaskAssignment";
-import TableroGuide from "@pages/tablero/tableroGuide";
+const AppRoutes = () => {
+    return (
+        <Router>
+            <Switch>
+                {/* Ruta por defecto redirige al login */}
+                <Route exact path="/" render={() => <Redirect to="/login" />} />
+                
+                {/* Ruta de login */}
+                <Route exact path="/login" component={LoginPage} />
+                
+                {/* Ruta del tablero */}
+                <Route exact path="/tablero" component={TableroBoard} />
+                
+                {/* Ruta de fallback */}
+                <Route path="*" render={() => <Redirect to="/login" />} />
+            </Switch>
+        </Router>
+    );
+};
 
-// RUTAS CON LAYOUT
-export const privateAdminRoutes = [
-    { path: "/dashboard", component: Dashboard },
-    { path: "/tablero/board", component: TableroTest }, // Usando componente de prueba
-    { path: "/tablero/tasks", component: TaskManagement },
-    { path: "/tablero/developers", component: DeveloperManagement },
-    { path: "/tablero/assignment", component: TaskAssignment },
-    { path: "/tablero/guide", component: TableroGuide },
-    { path: "/admin/reasons", component: Reasons },
-    { path: "/security/profiles", component: Perfiles },
-    { path: "/security/users", component: Usuarios },
-];
-
-// RUTAS SIN LAYOUT
-
-export const publicRoutes = [
-    { path: "/", component: Login, exact: true },
-    { path: "/restore-password/:token", component: ResetPassword },
-];
-
-export const errorRoute = { path: "*", component: NotFoundPage };
+export default AppRoutes;

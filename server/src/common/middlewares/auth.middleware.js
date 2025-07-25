@@ -1,7 +1,8 @@
 // Middleware de autenticación para las rutas de Tablero
 import jwt from "jsonwebtoken";
 import { pool } from "../configs/database.config.js";
-import { logger } from "../utils/logger.js";
+
+const JWT_SECRET = process.env.JWT_SECRET || 'tu_clave_secreta_muy_segura_para_tablero_2024';
 
 /**
  * Middleware de autenticación usando JWT
@@ -22,34 +23,46 @@ export const authenticateToken = async (req, res, next) => {
             });
         }
 
-        // Verificar token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Obtener información del usuario desde la base de datos
-        const [userRows] = await pool.execute(
-            'SELECT id, name, email FROM users WHERE id = ? AND active = 1',
-            [decoded.userId || decoded.id]
+        console.log('🔑 Token recibido:', token.substring(0, 20) + '...');
+
+        // Verificar el token JWT
+        const decoded = jwt.verify(token, JWT_SECRET);
+        console.log('✅ Token decodificado:', decoded);
+
+        // Verificar que el usuario existe en la base de datos
+        const [users] = await pool.execute(
+            'SELECT usu_id, usu_nombre, usu_email, usu_estado FROM usuarios WHERE usu_id = ? AND usu_estado = 1',
+            [decoded.usu_id]
         );
 
-        if (userRows.length === 0) {
+        if (users.length === 0) {
             return res.status(401).json({
                 success: false,
-                message: 'Usuario no encontrado o inactivo'
+                message: 'Usuario no válido o inactivo'
             });
         }
 
         // Agregar información del usuario a la request
         req.user = {
-            id: userRows[0].id,
-            name: userRows[0].name,
-            email: userRows[0].email
+            usu_id: users[0].usu_id,
+            nombre: users[0].usu_nombre,
+            email: users[0].usu_email,
+            ...decoded
         };
 
+        console.log('👤 Usuario autenticado:', req.user);
         next();
 
     } catch (error) {
-        logger.error('Error en middleware de autenticación:', error);
-
+        console.error('❌ Error en verificación de token:', error.message);
+        
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({
+                success: false,
+                message: 'Token inválido'
+            });
+        }
+        
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({
                 success: false,
@@ -57,10 +70,81 @@ export const authenticateToken = async (req, res, next) => {
             });
         }
 
+        return res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor'
+        });
+    }
+};
+
+/**
+ * Middleware para desarrollo (sin verificación estricta)
+ */
+export const devAuth = (req, res, next) => {
+    console.log('🔧 Modo desarrollo - Autenticación simulada');
+    
+    req.user = {
+        usu_id: 1,
+        nombre: 'Administrador Sistema',
+        email: 'admin@tablero.com'
+    };
+    
+    console.log('👤 Usuario simulado:', req.user);
+    next();
+};
+
+/**
+ * Middleware principal para verificar token JWT
+ */
+export const verifyToken = async (req, res, next) => {
+    try {
+        console.log('🔐 Verificando token de autenticación...');
+        
+        const authHeader = req.headers.authorization;
+        console.log('📋 Authorization Header:', authHeader);
+        
+        if (!authHeader) {
+            return res.status(401).json({
+                success: false,
+                message: 'Token de autorización requerido'
+            });
+        }
+
+        const token = authHeader.startsWith('Bearer ') 
+            ? authHeader.slice(7) 
+            : authHeader;
+
+        console.log('🔑 Token recibido:', token.substring(0, 20) + '...');
+
+        // Verificar el token JWT
+        const decoded = jwt.verify(token, JWT_SECRET);
+        console.log('✅ Token decodificado:', decoded);
+
+        // Agregar información del usuario a la request
+        req.user = {
+            usu_id: decoded.usu_id || decoded.id,
+            nombre: decoded.nombre || decoded.name,
+            email: decoded.email,
+            ...decoded
+        };
+
+        console.log('👤 Usuario autenticado:', req.user);
+        next();
+
+    } catch (error) {
+        console.error('❌ Error en verificación de token:', error.message);
+        
         if (error.name === 'JsonWebTokenError') {
             return res.status(401).json({
                 success: false,
                 message: 'Token inválido'
+            });
+        }
+        
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({
+                success: false,
+                message: 'Token expirado'
             });
         }
 
@@ -68,6 +152,17 @@ export const authenticateToken = async (req, res, next) => {
             success: false,
             message: 'Error interno del servidor'
         });
+    }
+};
+
+/**
+ * Middleware que decide entre verificación real y desarrollo
+ */
+export const authMiddleware = (req, res, next) => {
+    if (process.env.NODE_ENV === 'development') {
+        return devAuth(req, res, next);
+    } else {
+        return authenticateToken(req, res, next);
     }
 };
 
@@ -87,7 +182,7 @@ export const requireRole = (roles) => {
             // Verificar si el usuario tiene perfil de desarrollador en tablero
             const [developerRows] = await pool.execute(
                 'SELECT rol FROM tablero_desarrolladores WHERE usuario_id = ? AND esta_activo = 1',
-                [req.user.id]
+                [req.user.usu_id]
             );
 
             if (developerRows.length === 0) {
@@ -110,7 +205,7 @@ export const requireRole = (roles) => {
             next();
 
         } catch (error) {
-            logger.error('Error verificando rol:', error);
+            console.error('Error verificando rol:', error);
             return res.status(500).json({
                 success: false,
                 message: 'Error interno del servidor'
@@ -125,7 +220,7 @@ export const requireRole = (roles) => {
 export const canModifyTask = async (req, res, next) => {
     try {
         const taskId = req.params.id;
-        const userId = req.user.id;
+        const userId = req.user.usu_id;
 
         // Obtener información de la tarea
         const [taskRows] = await pool.execute(
@@ -166,13 +261,10 @@ export const canModifyTask = async (req, res, next) => {
         next();
 
     } catch (error) {
-        logger.error('Error verificando permisos de tarea:', error);
+        console.error('Error verificando permisos de tarea:', error);
         return res.status(500).json({
             success: false,
             message: 'Error interno del servidor'
         });
     }
 };
-
-// Alias para compatibilidad
-export const authMiddleware = authenticateToken;

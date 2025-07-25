@@ -9,10 +9,71 @@
     background-color: #ffffff;
 }
 
+.permisos-container {
+    padding: 20px;
+}
+
 .permisos-header {
-    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.permisos-title {
+    font-size: 24px;
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.permisos-subtitle {
+    color: #666;
+    font-size: 14px;
+}
+
+.permisos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.permiso-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    transition: box-shadow 0.2s;
+}
+
+.permiso-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.permiso-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.permiso-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.permiso-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.permiso-description {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
 .permission-info {

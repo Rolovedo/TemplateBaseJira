@@ -7,12 +7,17 @@ import { VentanaRecuperar } from "@components/generales";
 import { VenCambioClave } from "@components/generales/VenCambioClave";
 import "./styles/login.css";
 import { ruta } from "@utils/converAndConst";
-import LoginForm from "./LoginForm";
+//port LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import OtpVerificationModal from "./OtpVerificationModal";
 import useHandleApiError from "@hook/useHandleApiError";
 import { registerAPI, resendOtpAPI } from "@api/requests";
 import { ToastContext } from "@context/toast/ToastContext";
+import authService from '../../services/auth.service';
+import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
+import { Password } from 'primereact/password';
+//port { Toast } from 'primereact/toast';
 
 const Login = () => {
     const history = useHistory();
@@ -46,11 +51,22 @@ const Login = () => {
         setLoadingLogin(true);
 
         try {
+            // Login normal de PONTO
             const data = await login(usuario, clave);
 
             if (!data) return;
 
             const { cambioclave, usuId, perfil } = data;
+
+            // AGREGAR: Generar token para tablero después del login exitoso
+            try {
+                await authService.generateTableroToken(usuario, clave);
+                console.log('✅ Token de tablero generado exitosamente');
+            } catch (tokenError) {
+                console.log('⚠️ Error generando token tablero, usando auth PONTO:', tokenError);
+                // Fallback: usar autenticación existente de PONTO
+                authService.useExistingPontoAuth();
+            }
 
             if (Number(cambioclave) === 1) {
                 Cookies.set("autentificadoCASAL", false);
@@ -63,7 +79,7 @@ const Login = () => {
                 }
             }
         } catch (error) {
-            // manejar error si es necesario
+            console.error('❌ Error en login:', error);
         } finally {
             setLoadingLogin(false);
         }
@@ -168,14 +184,38 @@ const Login = () => {
                                             <p className="description">
                                                 Inicia sesión y sigue creciendo con nosotros.
                                             </p>
-                                            <LoginForm
-                                                register={register}
-                                                handleSubmit={handleSubmit}
-                                                errors={errors}
-                                                onLoginUser={onLoginUser}
-                                                loading={loadingLogin}
-                                                setActiveForm={setActiveForm}
-                                            />
+                                            <form onSubmit={onLoginUser} className="login-form">
+                                                <div className="p-field">
+                                                    <label htmlFor="usuario">Usuario o correo electrónico</label>
+                                                    <InputText
+                                                        id="usuario"
+                                                        {...register("usuario", { required: true })}
+                                                        placeholder="admin@tablero.com"
+                                                        className="w-full"
+                                                    />
+                                                    {errors.usuario && <small className="p-error">El usuario es requerido.</small>}
+                                                </div>
+
+                                                <div className="p-field">
+                                                    <label htmlFor="clave">Contraseña</label>
+                                                    <Password
+                                                        id="clave"
+                                                        {...register("clave", { required: true })}
+                                                        placeholder="••••••••"
+                                                        className="w-full"
+                                                        feedback={false}
+                                                        toggleMask
+                                                    />
+                                                    {errors.clave && <small className="p-error">La contraseña es requerida.</small>}
+                                                </div>
+
+                                                <Button
+                                                    type="submit"
+                                                    label={loadingLogin ? 'Iniciando sesión...' : 'Iniciar sesión'}
+                                                    className="w-full login-button"
+                                                    loading={loadingLogin}
+                                                />
+                                            </form>
                                         </>
                                     )}
                                 </div>

@@ -1,42 +1,115 @@
 import express from "express";
-import { verifyToken } from "../../common/middlewares/authjwt.middleware.js";
-import {
-  loginController,
-  registerUser,
-  resendOtpCode,
-  verifyOtpCode,
-  getSettlementController,
-  updateAccountController,
-  updatePasswordController,
-  getWindowsByProfileController,
-  validateCodePasswordController,
-  restorePasswordController,
-} from "./auth.controller.js";
+import jwt from "jsonwebtoken";
+import { loginController } from "./auth.controller.js";
 
 const authRoutes = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET || "tu_clave_secreta_muy_segura_para_tablero_2024";
 
+console.log("🔐 Configurando rutas de autenticación...");
+
+// Ruta de login principal (la que usa PONTO)
 authRoutes.post("/login", loginController);
 
-authRoutes.post("/register", registerUser);
+// Login específico para tablero (temporal/simulado)
+authRoutes.post("/tablero-login", async (req, res) => {
+  try {
+    console.log("🔐 Login tablero solicitado");
+    const { usuario, clave } = req.body;
 
-authRoutes.post("/resend-otp", resendOtpCode);
+    if (!usuario || !clave) {
+      return res.status(400).json({
+        success: false,
+        message: "Usuario y contraseña son requeridos",
+      });
+    }
 
-authRoutes.post("/verify-otp", verifyOtpCode);
+    // SIMULACIÓN TEMPORAL - En producción aquí iría la validación real
+    if (usuario && clave) {
+      // Generar token JWT
+      const token = jwt.sign(
+        {
+          usu_id: 1,
+          email: usuario.includes('@') ? usuario : 'admin@tablero.com',
+          nombre: "Administrador Sistema",
+        },
+        JWT_SECRET,
+        { expiresIn: "24h" }
+      );
 
-authRoutes.put("/update_password", updatePasswordController);
+      console.log("✅ Token generado para usuario:", usuario);
 
-authRoutes.get("/get_basic_information", verifyToken, getSettlementController);
+      res.json({
+        success: true,
+        message: "Login exitoso",
+        token,
+        usuId: 1,
+        usuFoto: null,
+        nombre: "Administrador Sistema",
+        usuario: usuario,
+        correo: usuario.includes('@') ? usuario : 'admin@tablero.com',
+        telefono: null,
+        documento: null,
+        perfil: 1,
+        agenda: 1,
+        instructor: 0,
+        permisos: [],
+        ventanas: [],
+        cambioclave: 0,
+        user: {
+          usu_id: 1,
+          nombre: "Administrador Sistema",
+          email: usuario.includes('@') ? usuario : 'admin@tablero.com',
+        },
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: "Credenciales inválidas",
+      });
+    }
+  } catch (error) {
+    console.error("❌ Error en login tablero:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+    });
+  }
+});
 
-authRoutes.get(
-  "/get_windows_by_profile",
-  verifyToken,
-  getWindowsByProfileController
-);
+// Verificar token
+authRoutes.get("/verify-token", async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
 
-authRoutes.put("/update_account", verifyToken, updateAccountController);
+    if (!authHeader) {
+      return res.status(401).json({
+        success: false,
+        message: "Token requerido",
+      });
+    }
 
-authRoutes.post("/validate_code_password", validateCodePasswordController);
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.slice(7)
+      : authHeader;
 
-authRoutes.post("/restore_password", restorePasswordController);
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    res.json({
+      success: true,
+      user: {
+        usu_id: decoded.usu_id,
+        nombre: decoded.nombre,
+        email: decoded.email,
+      },
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Token inválido",
+    });
+  }
+});
+
+console.log("✅ Rutas de autenticación configuradas");
 
 export default authRoutes;

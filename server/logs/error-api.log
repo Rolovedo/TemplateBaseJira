@@ -13,3 +13,43 @@
 [2025-06-11 14:25:42] ERROR: GET /api/appointments/get_available_session_by_date?fecha=2025-06-11 500 - 58982.701 ms 
 [2025-07-23T17:28:28.673Z] [ERROR] ❌ Error conectando a la base de datos: | Data: Unknown database 'tu_base_datos_tablero'
 [2025-07-23T17:30:29.382Z] [ERROR] ❌ Error conectando a la base de datos: | Data: Unknown database 'tablero_pavas'
+[2025-07-25T16:53:33.600Z] [ERROR] Error en middleware de autenticación: | Data: {
+  "name": "JsonWebTokenError",
+  "message": "jwt malformed"
+}
+[2025-07-25T16:55:35.829Z] [ERROR] Error en middleware de autenticación: | Data: {
+  "name": "JsonWebTokenError",
+  "message": "jwt malformed"
+}
+[2025-07-25T16:56:09.923Z] [ERROR] Error en middleware de autenticación: | Data: {
+  "name": "JsonWebTokenError",
+  "message": "jwt malformed"
+}
+[2025-07-25T16:56:20.816Z] [ERROR] Error en middleware de autenticación: | Data: {
+  "name": "JsonWebTokenError",
+  "message": "jwt malformed"
+}
+[2025-07-25T16:56:36.550Z] [ERROR] Error en middleware de autenticación: | Data: {
+  "name": "JsonWebTokenError",
+  "message": "jwt malformed"
+}
+[2025-07-25T16:57:20.737Z] [ERROR] Error en middleware de autenticación: | Data: {
+  "name": "JsonWebTokenError",
+  "message": "jwt malformed"
+}
+[2025-07-25T16:57:32.387Z] [ERROR] Error en middleware de autenticación: | Data: {
+  "name": "JsonWebTokenError",
+  "message": "jwt malformed"
+}
+[2025-07-25T16:58:37.490Z] [ERROR] Error en middleware de autenticación: | Data: {
+  "name": "JsonWebTokenError",
+  "message": "jwt malformed"
+}
+[2025-07-25T18:36:05.384Z] [ERROR] Error en middleware de autenticación: | Data: {
+  "name": "JsonWebTokenError",
+  "message": "jwt malformed"
+}
+[2025-07-25T18:46:58.876Z] [ERROR] Error en middleware de autenticación: | Data: {
+  "name": "JsonWebTokenError",
+  "message": "jwt malformed"
+}

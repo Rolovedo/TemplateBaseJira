@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
@@ -9,14 +9,15 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Badge } from 'primereact/badge';
 import { Avatar } from 'primereact/avatar';
 import { Chip } from 'primereact/chip';
-import { confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { useToast } from '@context/toast/ToastContext';
+import authService from '../../services/auth.service';
 import './tableroBoard.scss';
 
 const TableroBoard = () => {
-    const { showToast } = useToast();
+    const toast = useRef(null);
+
+    // Estados principales
     const [tasks, setTasks] = useState({
         backlog: [],
         todo: [],
@@ -24,253 +25,137 @@ const TableroBoard = () => {
         review: [],
         done: []
     });
-    
+
+    const [developers] = useState([ // Quitar setDevelopers ya que no se usa
+        { id: 1, name: 'Juan Pérez', email: 'juan@empresa.com', avatar: 'JP' },
+        { id: 2, name: 'María García', email: 'maria@empresa.com', avatar: 'MG' },
+        { id: 3, name: 'Carlos López', email: 'carlos@empresa.com', avatar: 'CL' }
+    ]);
+
     const [showTaskDialog, setShowTaskDialog] = useState(false);
-    const [showChangeRequestDialog, setShowChangeRequestDialog] = useState(false);
-    const [selectedTask, setSelectedTask] = useState(null);
+    const [editingTask, setEditingTask] = useState(null);
+    const [selectedColumn, setSelectedColumn] = useState('backlog');
+
+    // Estados del formulario
     const [newTask, setNewTask] = useState({
         title: '',
         description: '',
         assignee: null,
         priority: null,
         dueDate: null,
-        category: '',
+        category: null,
         estimatedHours: 0
     });
-    
-    const [developers, setDevelopers] = useState([]);
-    const [categories] = useState([
-        { label: 'Frontend', value: 'frontend' },
-        { label: 'Backend', value: 'backend' },
-        { label: 'Base de Datos', value: 'database' },
-        { label: 'DevOps', value: 'devops' },
-        { label: 'Testing', value: 'testing' },
-        { label: 'Documentación', value: 'documentation' }
-    ]);
-    
-    const [priorities] = useState([
-        { label: 'Muy Alta', value: 'very-high', severity: 'danger' },
-        { label: 'Alta', value: 'high', severity: 'warning' },
-        { label: 'Media', value: 'medium', severity: 'info' },
-        { label: 'Baja', value: 'low', severity: 'success' }
-    ]);
 
-    const columns = [
-        { id: 'backlog', title: 'Backlog', color: '#6c757d' },
-        { id: 'todo', title: 'Por Hacer', color: '#17a2b8' },
-        { id: 'inProgress', title: 'En Progreso', color: '#ffc107' },
-        { id: 'review', title: 'En Revisión', color: '#fd7e14' },
-        { id: 'done', title: 'Completado', color: '#28a745' }
+    // Opciones para dropdowns
+    const priorityOptions = [
+        { label: 'Alta', value: 'high', color: '#e74c3c' },
+        { label: 'Media', value: 'medium', color: '#f39c12' },
+        { label: 'Baja', value: 'low', color: '#27ae60' }
     ];
 
+    const categoryOptions = [
+        { label: 'Frontend', value: 'frontend' },
+        { label: 'Backend', value: 'backend' },
+        { label: 'Database', value: 'database' },
+        { label: 'Testing', value: 'testing' },
+        { label: 'DevOps', value: 'devops' }
+    ];
+
+    // Funciones de utilidad
+    const showToastMessage = (severity, summary, detail) => {
+        if (toast.current) {
+            toast.current.show({ severity, summary, detail });
+        }
+    };
+
+    // Cargar tareas (simuladas para desarrollo)
     const loadTasks = useCallback(async () => {
         try {
-            // Aquí cargarías las tareas desde la API
-            // const response = await fetch('/api/tablero/tasks');
-            // const data = await response.json();
-            // setTasks(data);
+            console.log('📡 Cargando tareas simuladas...');
             
-            // Datos de ejemplo más llamativos
-            setTasks({
+            // Datos simulados para desarrollo
+            const mockTasks = {
                 backlog: [
                     {
-                        id: '1',
-                        title: '🔐 Implementar autenticación',
-                        description: 'Crear sistema de login y registro de usuarios',
-                        assignee: { id: 1, name: 'Juan Pérez', avatar: 'JP' },
+                        id: 1,
+                        title: 'Configurar autenticación JWT',
+                        description: 'Implementar sistema de autenticación con tokens JWT',
+                        assignee: developers[0],
                         priority: 'high',
-                        dueDate: new Date('2024-08-15'),
+                        dueDate: new Date('2024-02-15'),
                         category: 'backend',
-                        estimatedHours: 16,
-                        createdDate: new Date(),
-                        collaborators: []
+                        estimatedHours: 8,
+                        createdBy: 'Admin',
+                        createdAt: new Date()
                     },
                     {
-                        id: '2',
-                        title: '🎨 Diseñar interfaz principal',
-                        description: 'Crear el diseño de la página principal del dashboard',
-                        assignee: { id: 2, name: 'María García', avatar: 'MG' },
+                        id: 2,
+                        title: 'Diseñar interfaz del tablero',
+                        description: 'Crear mockups y prototipos de la interfaz del tablero Kanban',
+                        assignee: developers[1],
                         priority: 'medium',
-                        dueDate: new Date('2024-08-20'),
+                        dueDate: new Date('2024-02-20'),
                         category: 'frontend',
                         estimatedHours: 12,
-                        createdDate: new Date(),
-                        collaborators: []
+                        createdBy: 'Admin',
+                        createdAt: new Date()
                     }
                 ],
                 todo: [
                     {
-                        id: '3',
-                        title: '📊 Configurar base de datos',
-                        description: 'Configurar las tablas y relaciones de la base de datos',
-                        assignee: { id: 3, name: 'Carlos López', avatar: 'CL' },
-                        priority: 'very-high',
-                        dueDate: new Date('2024-08-10'),
-                        category: 'database',
-                        estimatedHours: 8,
-                        createdDate: new Date(),
-                        collaborators: []
-                    }
-                ],
-                inProgress: [
-                    {
-                        id: '4',
-                        title: '🔧 Desarrollo de API REST',
-                        description: 'Implementar endpoints para el manejo de datos',
-                        assignee: { id: 1, name: 'Juan Pérez', avatar: 'JP' },
+                        id: 3,
+                        title: 'Conectar con base de datos',
+                        description: 'Establecer conexión con MySQL y crear modelos',
+                        assignee: developers[2],
                         priority: 'high',
-                        dueDate: new Date('2024-08-18'),
-                        category: 'backend',
-                        estimatedHours: 20,
-                        createdDate: new Date(),
-                        collaborators: []
+                        dueDate: new Date('2024-02-10'),
+                        category: 'database',
+                        estimatedHours: 6,
+                        createdBy: 'Admin',
+                        createdAt: new Date()
                     }
                 ],
+                inProgress: [],
                 review: [],
-                done: [
-                    {
-                        id: '5',
-                        title: '✅ Configuración inicial del proyecto',
-                        description: 'Configurar estructura de carpetas y dependencias',
-                        assignee: { id: 3, name: 'Carlos López', avatar: 'CL' },
-                        priority: 'medium',
-                        dueDate: new Date('2024-08-05'),
-                        category: 'devops',
-                        estimatedHours: 4,
-                        createdDate: new Date(),
-                        collaborators: []
-                    }
-                ]
-            });
-        } catch (error) {
-            console.error('Error loading tasks:', error);
-            showToast('error', 'Error', 'No se pudieron cargar las tareas');
-        }
-    }, [showToast]);
-
-    const loadDevelopers = useCallback(async () => {
-        try {
-            // Aquí se cargan los desarrolladores desde la API
-            setDevelopers([
-                { id: 1, name: 'Juan Pérez', avatar: 'JP', role: 'Frontend Developer' },
-                { id: 2, name: 'María García', avatar: 'MG', role: 'Backend Developer' },
-                { id: 3, name: 'Carlos López', avatar: 'CL', role: 'Full Stack Developer' }
-            ]);
-        } catch (error) {
-            console.error('Error loading developers:', error);
-        }
-    }, []);
-
-    useEffect(() => {
-        // Indicador visual en consola
-        console.log("🎯 TABLERO KANBAN CARGADO EXITOSAMENTE!");
-        console.log("📊 Componente TableroBoard renderizado correctamente");
-        console.log("✅ Si ves este mensaje, el tablero está funcionando");
-        
-        loadTasks();
-        loadDevelopers();
-    }, [loadTasks, loadDevelopers]);
-
-    const handleDragEnd = (result) => {
-        if (!result.destination) return;
-
-        const { source, destination } = result;
-        
-        if (source.droppableId === destination.droppableId) {
-            // Reordenar dentro de la misma columna
-            const column = [...tasks[source.droppableId]];
-            const [removed] = column.splice(source.index, 1);
-            column.splice(destination.index, 0, removed);
-            
-            setTasks(prev => ({
-                ...prev,
-                [source.droppableId]: column
-            }));
-        } else {
-            // Mover entre columnas
-            const sourceColumn = [...tasks[source.droppableId]];
-            const destColumn = [...tasks[destination.droppableId]];
-            const [removed] = sourceColumn.splice(source.index, 1);
-            
-            // Si el desarrollador quiere cambiar de tarea, solicitar confirmación
-            if (source.droppableId === 'inProgress' && destination.droppableId !== 'inProgress') {
-                confirmTaskChange(removed, sourceColumn, destColumn, source.droppableId, destination.droppableId);
-                return;
-            }
-            
-            destColumn.splice(destination.index, 0, removed);
-            
-            setTasks(prev => ({
-                ...prev,
-                [source.droppableId]: sourceColumn,
-                [destination.droppableId]: destColumn
-            }));
-            
-            // Actualizar estado en la base de datos
-            updateTaskStatus(removed.id, destination.droppableId);
-        }
-    };
-
-    const confirmTaskChange = (task, sourceColumn, destColumn, sourceId, destId) => {
-        confirmDialog({
-            message: '¿Estás seguro de que quieres cambiar esta tarea? Se notificará al jefe de programadores.',
-            header: 'Confirmar Cambio de Tarea',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                // Enviar notificación de WhatsApp al jefe
-                sendWhatsAppNotification(task);
-                setSelectedTask({ ...task, sourceColumn, destColumn, sourceId, destId });
-                setShowChangeRequestDialog(true);
-            }
-        });
-    };
-
-    const sendWhatsAppNotification = async (task) => {
-        try {
-            // Aquí enviarías la notificación de WhatsApp
-            // const message = `🔄 CAMBIO DE TAREA SOLICITADO\n\nDesarrollador: ${task.assignee?.name}\nTarea: ${task.title}\n\n¿Aprobar el cambio?`;
-            
-            // await fetch('/api/whatsapp/send-notification', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ message, taskId: task.id })
-            // });
-            
-            showToast('info', 'Notificación Enviada', 'Se ha notificado al jefe de programadores');
-        } catch (error) {
-            console.error('Error sending WhatsApp notification:', error);
-        }
-    };
-
-    const updateTaskStatus = async (taskId, newStatus) => {
-        try {
-            // await fetch(`/api/tablero/tasks/${taskId}/status`, {
-            //     method: 'PUT',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ status: newStatus })
-            // });
-        } catch (error) {
-            console.error('Error updating task status:', error);
-        }
-    };
-
-    const createTask = async () => {
-        try {
-            if (!newTask.title || !newTask.assignee) {
-                showToast('warn', 'Campos Requeridos', 'Título y asignado son obligatorios');
-                return;
-            }
-
-            const task = {
-                ...newTask,
-                id: Date.now().toString(),
-                createdDate: new Date(),
-                collaborators: []
+                done: []
             };
 
-            setTasks(prev => ({
-                ...prev,
-                backlog: [...prev.backlog, task]
+            setTasks(mockTasks);
+            console.log('✅ Tareas simuladas cargadas');
+            
+        } catch (error) {
+            console.error('Error cargando tareas:', error);
+            showToastMessage('error', 'Error', 'No se pudieron cargar las tareas');
+        }
+    }, [developers]);
+
+    // Crear nueva tarea
+    const createTask = async () => {
+        try {
+            console.log('🔍 Creando nueva tarea...');
+            
+            if (!newTask.title || !newTask.assignee) {
+                showToastMessage('warn', 'Campos Requeridos', 'Título y asignado son obligatorios');
+                return;
+            }
+
+            const taskToCreate = {
+                id: Date.now(),
+                title: newTask.title,
+                description: newTask.description,
+                assignee: newTask.assignee,
+                priority: newTask.priority?.value || 'medium',
+                dueDate: newTask.dueDate,
+                category: newTask.category?.value,
+                estimatedHours: newTask.estimatedHours || 0,
+                createdBy: authService.getTableroUser()?.nombre || 'Usuario',
+                createdAt: new Date()
+            };
+
+            setTasks(prevTasks => ({
+                ...prevTasks,
+                [selectedColumn]: [...prevTasks[selectedColumn], taskToCreate]
             }));
 
             setNewTask({
@@ -279,110 +164,156 @@ const TableroBoard = () => {
                 assignee: null,
                 priority: null,
                 dueDate: null,
-                category: '',
+                category: null,
                 estimatedHours: 0
             });
 
             setShowTaskDialog(false);
-            showToast('success', 'Tarea Creada', 'La tarea se ha creado exitosamente');
+            showToastMessage('success', 'Tarea Creada', 'La tarea se ha creado exitosamente');
+            
+            console.log('✅ Tarea creada exitosamente:', taskToCreate);
+
         } catch (error) {
-            console.error('Error creating task:', error);
-            showToast('error', 'Error', 'No se pudo crear la tarea');
+            console.error('Error creando tarea:', error);
+            showToastMessage('error', 'Error', 'No se pudo crear la tarea');
         }
     };
 
-    const getPriorityColor = (priority) => {
-        const priorityObj = priorities.find(p => p.value === priority);
-        return priorityObj?.severity || 'info';
+    // Manejar drag and drop
+    const onDragEnd = (result) => {
+        const { destination, source, draggableId } = result;
+
+        if (!destination) {
+            return;
+        }
+
+        if (destination.droppableId === source.droppableId && destination.index === source.index) {
+            return;
+        }
+
+        const start = tasks[source.droppableId];
+        const finish = tasks[destination.droppableId];
+
+        if (start === finish) {
+            const newTaskIds = Array.from(start);
+            const task = newTaskIds.find(t => t.id.toString() === draggableId);
+            newTaskIds.splice(source.index, 1);
+            newTaskIds.splice(destination.index, 0, task);
+
+            setTasks(prev => ({
+                ...prev,
+                [source.droppableId]: newTaskIds
+            }));
+        } else {
+            const startTaskIds = Array.from(start);
+            const task = startTaskIds.find(t => t.id.toString() === draggableId);
+            startTaskIds.splice(source.index, 1);
+
+            const finishTaskIds = Array.from(finish);
+            finishTaskIds.splice(destination.index, 0, task);
+
+            setTasks(prev => ({
+                ...prev,
+                [source.droppableId]: startTaskIds,
+                [destination.droppableId]: finishTaskIds
+            }));
+
+            showToastMessage('success', 'Tarea Movida', `Tarea movida a ${destination.droppableId}`);
+        }
     };
 
-    const TaskCard = ({ task, index }) => (
-        <Draggable key={task.id} draggableId={task.id} index={index}>
+    useEffect(() => {
+        console.log("🎯 TABLERO KANBAN CARGADO EXITOSAMENTE!");
+        
+        if (!authService.isTableroAuthenticated()) {
+            if (!authService.useExistingPontoAuth()) {
+                authService.setDevelopmentAuth();
+            }
+        }
+        
+        loadTasks();
+    }, [loadTasks]);
+
+    const columns = [
+        { id: 'backlog', title: 'Backlog', color: '#6c757d' },
+        { id: 'todo', title: 'Por Hacer', color: '#007bff' },
+        { id: 'inProgress', title: 'En Progreso', color: '#ffc107' },
+        { id: 'review', title: 'En Revisión', color: '#17a2b8' },
+        { id: 'done', title: 'Completado', color: '#28a745' }
+    ];
+
+    const renderTaskCard = (task, index) => (
+        <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
             {(provided, snapshot) => (
-                <Card
+                <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     className={`task-card ${snapshot.isDragging ? 'dragging' : ''}`}
-                    style={{
-                        ...provided.draggableProps.style,
-                        marginBottom: '8px'
-                    }}
                 >
-                    <div className="task-header">
-                        <h4>{task.title}</h4>
-                        <Badge 
-                            value={task.priority} 
-                            severity={getPriorityColor(task.priority)} 
-                            size="small" 
-                        />
-                    </div>
-                    
-                    <p className="task-description">{task.description}</p>
-                    
-                    <div className="task-meta">
-                        <Chip label={task.category} className="category-chip" />
-                        <span className="estimated-hours">{task.estimatedHours}h</span>
-                    </div>
-                    
-                    <div className="task-footer">
-                        <div className="assignee">
-                            <Avatar label={task.assignee?.avatar} size="small" />
-                            <span>{task.assignee?.name}</span>
+                    <Card className="task-card-content">
+                        <div className="task-header">
+                            <h4 className="task-title">{task.title}</h4>
+                            <Badge 
+                                value={task.priority} 
+                                severity={task.priority === 'high' ? 'danger' : task.priority === 'medium' ? 'warning' : 'success'}
+                            />
                         </div>
-                        {task.dueDate && (
-                            <span className="due-date">
-                                {new Date(task.dueDate).toLocaleDateString()}
-                            </span>
+                        
+                        {task.description && (
+                            <p className="task-description">{task.description}</p>
                         )}
-                    </div>
-                </Card>
+                        
+                        <div className="task-footer">
+                            <div className="task-assignee">
+                                <Avatar 
+                                    label={task.assignee?.avatar || task.assignee?.name?.substring(0, 2) || 'U'} 
+                                    size="small" 
+                                    style={{ backgroundColor: '#007bff' }}
+                                />
+                                <span>{task.assignee?.name || 'Sin asignar'}</span>
+                            </div>
+                            
+                            {task.category && (
+                                <Chip label={task.category} className="category-chip" />
+                            )}
+                        </div>
+                        
+                        {task.estimatedHours > 0 && (
+                            <div className="task-hours">
+                                <i className="pi pi-clock"></i>
+                                <span>{task.estimatedHours}h</span>
+                            </div>
+                        )}
+                    </Card>
+                </div>
             )}
         </Draggable>
     );
 
     return (
         <div className="tablero-board">
-            {/* Banner de confirmación visual */}
-            <div className="tablero-banner">
-                <div className="banner-content">
-                    <i className="pi pi-check-circle banner-icon"></i>
-                    <div className="banner-text">
-                        <h3>¡Tablero Kanban Funcionando!</h3>
-                        <p>El tablero se está cargando correctamente. Si ves este mensaje, ¡la navegación está funcionando!</p>
-                    </div>
-                </div>
-            </div>
+            <Toast ref={toast} />
             
             <div className="board-header">
-                <div className="header-title">
-                    <i className="pi pi-th-large header-icon"></i>
-                    <h2>Tablero de Desarrollo</h2>
-                    <Badge value="ACTIVO" severity="success" className="status-badge" />
-                </div>
-                <div className="header-actions">
-                    <Button 
-                        icon="pi pi-question-circle" 
-                        label="Guía de Uso" 
-                        className="p-button-outlined p-button-info"
-                        onClick={() => window.open('/tablero-guide', '_blank')}
-                    />
-                    <Button 
-                        icon="pi pi-plus" 
-                        label="Nueva Tarea" 
-                        onClick={() => setShowTaskDialog(true)}
-                    />
-                </div>
+                <h1>
+                    <span role="img" aria-label="tablero">📋</span> Tablero Kanban - PAVAS
+                </h1>
+                <Button 
+                    label="➕ Nueva Tarea" 
+                    className="p-button-success"
+                    onClick={() => {
+                        setSelectedColumn('backlog');
+                        setShowTaskDialog(true);
+                    }}
+                />
             </div>
 
-            <DragDropContext onDragEnd={handleDragEnd}>
+            <DragDropContext onDragEnd={onDragEnd}>
                 <div className="board-columns">
                     {columns.map(column => (
                         <div key={column.id} className="board-column">
-                            <div 
-                                className="column-header"
-                                style={{ borderColor: column.color }}
-                            >
+                            <div className="column-header" style={{ borderTopColor: column.color }}>
                                 <h3>{column.title}</h3>
                                 <Badge value={tasks[column.id]?.length || 0} />
                             </div>
@@ -394,9 +325,9 @@ const TableroBoard = () => {
                                         {...provided.droppableProps}
                                         className={`column-content ${snapshot.isDraggingOver ? 'drag-over' : ''}`}
                                     >
-                                        {tasks[column.id]?.map((task, index) => (
-                                            <TaskCard key={task.id} task={task} index={index} />
-                                        ))}
+                                        {tasks[column.id]?.map((task, index) => 
+                                            renderTaskCard(task, index)
+                                        )}
                                         {provided.placeholder}
                                     </div>
                                 )}
@@ -406,27 +337,15 @@ const TableroBoard = () => {
                 </div>
             </DragDropContext>
 
-            {/* Dialog para crear nueva tarea */}
             <Dialog
-                header="Nueva Tarea"
                 visible={showTaskDialog}
                 style={{ width: '600px' }}
-                onHide={() => setShowTaskDialog(false)}
-                footer={
-                    <div>
-                        <Button 
-                            label="Cancelar" 
-                            icon="pi pi-times" 
-                            className="p-button-text"
-                            onClick={() => setShowTaskDialog(false)} 
-                        />
-                        <Button 
-                            label="Crear" 
-                            icon="pi pi-check" 
-                            onClick={createTask} 
-                        />
-                    </div>
-                }
+                header={editingTask ? 'Editar Tarea' : 'Nueva Tarea'}
+                modal
+                onHide={() => {
+                    setShowTaskDialog(false);
+                    setEditingTask(null);
+                }}
             >
                 <div className="task-form">
                     <div className="p-field">
@@ -434,8 +353,8 @@ const TableroBoard = () => {
                         <InputText
                             id="title"
                             value={newTask.title}
-                            onChange={(e) => setNewTask({...newTask, title: e.target.value})}
-                            placeholder="Ingrese el título de la tarea"
+                            onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
+                            placeholder="Ingresa el título de la tarea"
                         />
                     </div>
 
@@ -444,9 +363,9 @@ const TableroBoard = () => {
                         <InputTextarea
                             id="description"
                             value={newTask.description}
-                            onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+                            onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
                             rows={3}
-                            placeholder="Describa la tarea"
+                            placeholder="Describe la tarea"
                         />
                     </div>
 
@@ -456,9 +375,9 @@ const TableroBoard = () => {
                             id="assignee"
                             value={newTask.assignee}
                             options={developers}
-                            onChange={(e) => setNewTask({...newTask, assignee: e.value})}
+                            onChange={(e) => setNewTask(prev => ({ ...prev, assignee: e.value }))}
                             optionLabel="name"
-                            placeholder="Seleccione un desarrollador"
+                            placeholder="Selecciona un desarrollador"
                         />
                     </div>
 
@@ -467,10 +386,10 @@ const TableroBoard = () => {
                         <Dropdown
                             id="priority"
                             value={newTask.priority}
-                            options={priorities}
-                            onChange={(e) => setNewTask({...newTask, priority: e.value})}
+                            options={priorityOptions}
+                            onChange={(e) => setNewTask(prev => ({ ...prev, priority: e.value }))}
                             optionLabel="label"
-                            placeholder="Seleccione prioridad"
+                            placeholder="Selecciona prioridad"
                         />
                     </div>
 
@@ -479,21 +398,10 @@ const TableroBoard = () => {
                         <Dropdown
                             id="category"
                             value={newTask.category}
-                            options={categories}
-                            onChange={(e) => setNewTask({...newTask, category: e.value})}
+                            options={categoryOptions}
+                            onChange={(e) => setNewTask(prev => ({ ...prev, category: e.value }))}
                             optionLabel="label"
-                            placeholder="Seleccione categoría"
-                        />
-                    </div>
-
-                    <div className="p-field">
-                        <label htmlFor="dueDate">Fecha Límite</label>
-                        <Calendar
-                            id="dueDate"
-                            value={newTask.dueDate}
-                            onChange={(e) => setNewTask({...newTask, dueDate: e.value})}
-                            showIcon
-                            placeholder="Seleccione fecha límite"
+                            placeholder="Selecciona categoría"
                         />
                     </div>
 
@@ -503,38 +411,36 @@ const TableroBoard = () => {
                             id="estimatedHours"
                             type="number"
                             value={newTask.estimatedHours}
-                            onChange={(e) => setNewTask({...newTask, estimatedHours: parseInt(e.target.value) || 0})}
+                            onChange={(e) => setNewTask(prev => ({ ...prev, estimatedHours: parseInt(e.target.value) || 0 }))}
                             placeholder="0"
+                        />
+                    </div>
+
+                    <div className="p-field">
+                        <label htmlFor="dueDate">Fecha de Vencimiento</label>
+                        <Calendar
+                            id="dueDate"
+                            value={newTask.dueDate}
+                            onChange={(e) => setNewTask(prev => ({ ...prev, dueDate: e.value }))}
+                            showIcon
+                            dateFormat="dd/mm/yy"
+                        />
+                    </div>
+
+                    <div className="form-buttons">
+                        <Button 
+                            label="Cancelar" 
+                            className="p-button-secondary"
+                            onClick={() => setShowTaskDialog(false)}
+                        />
+                        <Button 
+                            label={editingTask ? 'Actualizar' : 'Crear Tarea'} 
+                            className="p-button-success"
+                            onClick={createTask}
                         />
                     </div>
                 </div>
             </Dialog>
-
-            {/* Dialog para solicitud de cambio de tarea */}
-            <Dialog
-                header="Solicitud de Cambio de Tarea"
-                visible={showChangeRequestDialog}
-                style={{ width: '500px' }}
-                onHide={() => setShowChangeRequestDialog(false)}
-            >
-                <p>Se ha enviado una notificación de WhatsApp al jefe de programadores.</p>
-                <p>Esperando respuesta para aprobar o rechazar el cambio de tarea.</p>
-                {selectedTask && (
-                    <div className="p-mt-2 p-p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                        <strong>Tarea:</strong> {selectedTask.title}<br />
-                        <strong>Asignado a:</strong> {selectedTask.assignee?.name}
-                    </div>
-                )}
-                <div className="p-mt-3">
-                    <Button 
-                        label="Cerrar" 
-                        className="p-button-text"
-                        onClick={() => setShowChangeRequestDialog(false)} 
-                    />
-                </div>
-            </Dialog>
-
-            <Toast ref={showToast} />
         </div>
     );
 };

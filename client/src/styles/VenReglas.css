@@ -1,3 +1,30 @@
+ASUS\OneDrive\Documentos\Programacion\TableroPavas\client\src\styles\VenReglas.css */
+.ven-reglas {
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.ven-reglas h2 {
+    margin-bottom: 16px;
+    color: #333;
+}
+
+.ven-reglas .rules-list {
+    list-style: none;
+    padding: 0;
+}
+
+.ven-reglas .rules-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.ven-reglas .rules-list li:last-child {
+    border-bottom: none;
+}
+
 .container {
     display: flex;
     height: 100%;

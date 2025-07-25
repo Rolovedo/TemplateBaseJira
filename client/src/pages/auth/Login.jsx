@@ -40,13 +40,37 @@ const Login = () => {
 
     const onLoginUser = async ({ usuario, clave }) => {
         try {
-            await login(usuario, clave);
+            console.log('🔐 Iniciando login...');
+            
+            // Interceptar la respuesta del login
+            const loginResponse = await login(usuario, clave);
+            
+            // Verificar si hay token en cookies o en la respuesta
+            const cookieToken = Cookies.get('token') || Cookies.get('authToken');
+            
+            if (cookieToken) {
+                console.log('✅ Token encontrado en cookies, copiando a localStorage...');
+                localStorage.setItem('token', cookieToken);
+            }
+            
+            // También verificar si hay datos de usuario en cookies
+            const userCookie = Cookies.get('user');
+            if (userCookie) {
+                localStorage.setItem('user', userCookie);
+            }
+            
+            console.log('📋 Verificando localStorage después del login:');
+            console.log('Token:', localStorage.getItem('token'));
+            console.log('User:', localStorage.getItem('user'));
+            console.log('All keys:', Object.keys(localStorage));
+
             const cambioclave = Number(localStorage.getItem("cambioclave"));
             if (cambioclave === 1) {
                 Cookies.set("autentificadoCASAL", false);
                 setShowChangePasswordModal(true);
             }
         } catch (error) {
+            console.error('❌ Error en login:', error);
             window.location.href = `${ruta}`;
         }
     };
