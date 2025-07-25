@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 24-07-2025 a las 18:42:00
+-- Tiempo de generación: 25-07-2025 a las 17:22:01
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -105,7 +105,7 @@ CREATE TABLE `tablero_desarrolladores` (
 
 --
 -- Estructura Stand-in para la vista `tablero_estadisticas_desarrolladores`
--- (Abajo está la vista actual)
+-- (Véase abajo para la vista actual)
 --
 CREATE TABLE `tablero_estadisticas_desarrolladores` (
 `usuario_id` int(11)
@@ -536,6 +536,38 @@ INSERT INTO `tbl_ventanas` (`ven_id`, `ven_nombre`, `ven_descripcion`, `ven_ruta
 (6, 'Guía de Uso', 'Reportes y estadísticas', 'tablero/guide', 'tablero/guide', 'pi pi-question-circle', 6, 0, 1),
 (7, 'Usuarios', 'Configuración del sistema', 'security/users', 'security/users', 'pi pi-user-edit', 7, 0, 1),
 (8, 'Configuración', 'Administración de usuarios', 'admin/settings', 'admin/settings', 'pi pi-cog', 8, 0, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tbl_ventanas_backup_20250724`
+--
+
+CREATE TABLE `tbl_ventanas_backup_20250724` (
+  `ven_id` int(11) NOT NULL DEFAULT 0,
+  `ven_nombre` varchar(100) NOT NULL,
+  `ven_descripcion` varchar(255) DEFAULT NULL,
+  `ven_ruta` varchar(255) DEFAULT NULL,
+  `ven_url` varchar(255) DEFAULT NULL,
+  `ven_icono` varchar(50) DEFAULT NULL,
+  `ven_orden` int(11) DEFAULT 0,
+  `ven_padre` int(11) DEFAULT 0,
+  `est_id` int(11) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tbl_ventanas_backup_20250724`
+--
+
+INSERT INTO `tbl_ventanas_backup_20250724` (`ven_id`, `ven_nombre`, `ven_descripcion`, `ven_ruta`, `ven_url`, `ven_icono`, `ven_orden`, `ven_padre`, `est_id`) VALUES
+(1, 'Dashboard', 'Panel principal del sistema', '/dashboard', '/dashboard', 'pi pi-home', 1, 0, 1),
+(2, 'Tablero', 'Tablero visual de tareas estilo Kanban', '/tablero/board', '/tablero/board', 'pi pi-th-large', 2, 0, 1),
+(3, 'Gestión de Tareas', 'Administración y gestión de tareas', '/tablero/tasks', '/tablero/tasks', 'pi pi-list', 3, 0, 1),
+(4, 'Asignación de Tareas', 'Asignación de tareas a desarrolladores', '/tablero/assignment', '/tablero/assignment', 'pi pi-users', 4, 0, 1),
+(5, 'Desarrolladores', 'Gestión de desarrolladores', '/tablero/developers', '/tablero/developers', 'pi pi-user', 5, 0, 1),
+(6, 'Guía de Uso', 'Reportes y estadísticas', '/tablero/guide', '/tablero/guide', 'pi pi-question-circle', 6, 0, 1),
+(7, 'Usuarios', 'Configuración del sistema', '/security/users', '/security/users', 'pi pi-user-edit', 7, 0, 1),
+(8, 'Configuración', 'Administración de usuarios', '/admin/settings', '/admin/settings', 'pi pi-cog', 8, 0, 1);
 
 -- --------------------------------------------------------
 
