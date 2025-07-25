@@ -1,8 +1,9 @@
 .tablero-board {
-  padding: 20px;
   height: 100vh;
-  overflow: hidden;
-  
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // Evitar scroll vertical del contenedor principal
+
   // Banner de confirmación visual
   .tablero-banner {
     background: linear-gradient(135deg, #28a745, #20c997);
@@ -40,63 +41,77 @@
   }
   
   .board-header {
+    flex-shrink: 0;
+    padding: 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border-left: 5px solid #007bff;
-    
-    .header-title {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      
-      .header-icon {
-        font-size: 1.8rem;
-        color: #007bff;
-      }
-      
-      h2 {
-        margin: 0;
-        color: #495057;
-        font-weight: 600;
-        font-size: 1.8rem;
-      }
-      
-      .status-badge {
-        font-size: 0.75rem;
-        animation: pulse 2s infinite;
-      }
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 10;
+
+    h1 {
+      margin: 0;
+      color: #333;
+      font-size: 28px;
+      font-weight: 600;
     }
-    
-    .header-actions {
-      display: flex;
-      gap: 10px;
+
+    .p-button {
+      height: 40px;
+      padding: 0 20px;
     }
   }
-  
+
   .board-columns {
+    flex: 1;
     display: flex;
     gap: 20px;
-    height: calc(100vh - 120px);
-    overflow-x: auto;
-    padding-bottom: 20px;
+    padding: 20px;
+    overflow-x: auto; // ← SCROLL HORIZONTAL
+    overflow-y: hidden; // ← NO SCROLL VERTICAL
+    height: calc(100vh - 120px); // Altura fija menos header
+    min-height: 0; // Importante para flex
+    
+    // FORZAR ancho mínimo para que aparezca scroll horizontal
+    min-width: min-content;
+    white-space: nowrap; // ← IMPORTANTE: evita que las columnas se envuelvan
+    
+    // Estilos del scrollbar horizontal más visible
+    &::-webkit-scrollbar {
+      height: 12px; // ← Más alto para que sea más visible
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 6px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #007bff; // ← Color más visible
+      border-radius: 6px;
+      
+      &:hover {
+        background: #0056b3;
+      }
+    }
     
     .board-column {
-      flex: 0 0 300px;
+      flex: 0 0 350px; // ← ANCHO MÁS GRANDE para forzar scroll
+      min-width: 350px; // ← ANCHO MÍNIMO más grande
+      max-width: 350px; // ← ANCHO MÁXIMO más grande
+      height: calc(100vh - 160px); // ← ALTURA FIJA específica
       background: linear-gradient(145deg, #f8f9fa, #e9ecef);
       border-radius: 12px;
       display: flex;
       flex-direction: column;
-      max-height: 100%;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       border: 1px solid #dee2e6;
+      white-space: normal; // ← Restablecer para contenido interno
       
       .column-header {
+        flex-shrink: 0; // ← NO se encoge
         padding: 20px;
         border-left: 4px solid;
         background: linear-gradient(135deg, #ffffff, #f8f9fa);
@@ -108,67 +123,86 @@
         
         h3 {
           margin: 0;
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: #2c3e50;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
+          color: #333;
+          font-size: 18px;
+          font-weight: 600;
         }
         
         .p-badge {
-          font-weight: 600;
-          min-width: 25px;
-          height: 25px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          background: #6c757d;
+          min-width: 24px;
+          height: 24px;
+          border-radius: 12px;
         }
       }
       
       .column-content {
-        flex: 1;
+        flex: 1; // ← OCUPA el espacio restante
         padding: 15px;
-        overflow-y: auto;
-        min-height: 200px;
-        transition: all 0.3s ease;
+        overflow-y: auto; // ← SCROLL VERTICAL solo para las tareas
+        overflow-x: hidden; // ← NO scroll horizontal dentro de la columna
+        min-height: 0; // ← Importante para flex
+        
+        // Estilos del scrollbar vertical dentro de cada columna
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 3px;
+          
+          &:hover {
+            background: #a8a8a8;
+          }
+        }
         
         &.drag-over {
-          background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(0, 123, 255, 0.05));
-          transform: scale(1.02);
+          background: rgba(0, 123, 255, 0.1);
+          border: 2px dashed #007bff;
+          border-radius: 8px;
         }
       }
     }
   }
   
+  // Estilos para las tarjetas de tareas
   .task-card {
-    border: 1px solid #e3e6ea;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #ffffff, #f8f9fa);
-    transition: all 0.3s ease;
+    margin-bottom: 15px;
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
+    transition: all 0.2s ease;
     
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #007bff, #28a745);
-    }
-    
-    &:hover {
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-      transform: translateY(-3px);
-      border-color: #007bff;
+    &:last-child {
+      margin-bottom: 0;
     }
     
     &.dragging {
-      transform: rotate(3deg) scale(1.05);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      z-index: 1000;
+      transform: rotate(5deg);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    
+    .task-card-content {
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+      
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+      }
+      
+      .p-card-body {
+        padding: 16px;
+      }
+      
+      .p-card-content {
+        padding: 0;
+      }
     }
     
     .task-header {
@@ -177,60 +211,55 @@
       align-items: flex-start;
       margin-bottom: 12px;
       
-      h4 {
+      .task-title {
         margin: 0;
-        font-size: 1rem;
+        font-size: 14px;
         font-weight: 600;
-        color: #2c3e50;
+        color: #333;
         line-height: 1.3;
         flex: 1;
-        margin-right: 10px;
+        margin-right: 8px;
       }
       
       .p-badge {
-        font-size: 0.7rem;
-        font-weight: 600;
+        flex-shrink: 0;
+        font-size: 10px;
         padding: 4px 8px;
-        border-radius: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
       }
     }
     
     .task-description {
-      color: #6c757d;
-      font-size: 0.9rem;
+      margin: 0 0 12px 0;
+      font-size: 12px;
+      color: #666;
       line-height: 1.4;
-      margin-bottom: 15px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      line-clamp: 2;
-      -webkit-box-orient: vertical;
+      max-height: 60px;
       overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+    //-webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
     }
     
     .task-meta {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       
       .category-chip {
+        font-size: 10px;
+        height: 20px;
         background: #e9ecef;
         color: #495057;
-        font-size: 0.75rem;
-        font-weight: 500;
-        padding: 4px 8px;
-        border-radius: 8px;
+        padding: 2px 8px;
+        border-radius: 10px;
       }
       
       .estimated-hours {
-        font-size: 0.8rem;
+        font-size: 11px;
         color: #6c757d;
         font-weight: 500;
-        background: #f8f9fa;
-        padding: 2px 6px;
-        border-radius: 4px;
       }
     }
     
@@ -245,80 +274,12 @@
         gap: 8px;
         
         .p-avatar {
-          background: #007bff;
-          color: white;
-          font-weight: 600;
-          font-size: 0.8rem;
+          flex-shrink: 0;
         }
-        
-        span {
-          font-size: 0.85rem;
-          color: #495057;
-          font-weight: 500;
-        }
-      }
-      
-      .due-date {
-        font-size: 0.8rem;
-        color: #6c757d;
-        background: #fff3cd;
-        padding: 2px 6px;
-        border-radius: 4px;
-        border: 1px solid #ffeaa7;
-      }
-    }
-  }
-      
-      h4 {
-        margin: 0;
-        font-size: 14px;
-        font-weight: 600;
-        color: #495057;
-        flex: 1;
-        margin-right: 10px;
-      }
-    }
-    
-    .task-description {
-      font-size: 12px;
-      color: #6c757d;
-      margin: 0 0 15px 0;
-      line-height: 1.4;
-    }
-    
-    .task-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      
-      .category-chip {
-        font-size: 10px;
-        padding: 2px 8px;
-        background: #e9ecef;
-        color: #495057;
-      }
-      
-      .estimated-hours {
-        font-size: 12px;
-        color: #6c757d;
-        font-weight: 500;
-      }
-    }
-    
-    .task-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      
-      .assignee {
-        display: flex;
-        align-items: center;
-        gap: 8px;
         
         span {
           font-size: 12px;
-          color: #495057;
+          color: #666;
           font-weight: 500;
         }
       }
@@ -329,26 +290,51 @@
       }
     }
   }
-  
-  .task-form {
-    .p-field {
-      margin-bottom: 20px;
-      
-      label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 600;
-        color: #495057;
+
+  // Estilos para el diálogo de nueva tarea
+  .p-dialog {
+    .task-form {
+      .p-field {
+        margin-bottom: 20px;
+        
+        label {
+          display: block;
+          margin-bottom: 6px;
+          font-weight: 600;
+          color: #333;
+          font-size: 14px;
+        }
+        
+        .p-inputtext,
+        .p-dropdown,
+        .p-calendar,
+        .p-inputtextarea {
+          width: 100%;
+        }
       }
       
-      .p-inputtext,
-      .p-dropdown,
-      .p-calendar,
-      .p-inputtextarea {
-        width: 100%;
+      .form-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 30px;
+        
+        .p-button {
+          min-width: 100px;
+        }
       }
     }
   }
+
+  // Colores específicos para cada columna
+  .board-column {
+    &:nth-child(1) .column-header { border-left-color: #6c757d; } // Backlog
+    &:nth-child(2) .column-header { border-left-color: #007bff; } // Por Hacer
+    &:nth-child(3) .column-header { border-left-color: #ffc107; } // En Progreso
+    &:nth-child(4) .column-header { border-left-color: #17a2b8; } // En Revisión
+    &:nth-child(5) .column-header { border-left-color: #28a745; } // Completado
+  }
+}
 
 // Animaciones
 @keyframes slideInFromTop {
@@ -377,65 +363,39 @@
 // Responsive design
 @media (max-width: 768px) {
   .tablero-board {
-    padding: 10px;
+    .board-columns {
+      padding: 10px;
+      gap: 15px;
+      
+      .board-column {
+        flex: 0 0 300px;
+        min-width: 300px;
+        max-width: 300px;
+      }
+    }
     
     .board-header {
       flex-direction: column;
       gap: 15px;
-      align-items: stretch;
+      padding: 15px;
       
-      .header-actions {
-        justify-content: center;
-      }
-    }
-    
-    .board-columns {
-      flex-direction: column;
-      height: auto;
-      
-      .board-column {
-        flex: none;
-        margin-bottom: 20px;
+      h1 {
+        font-size: 24px;
       }
     }
   }
 }
 
-// Priority colors
-.p-badge {
-  &.p-badge-danger {
-    background-color: #dc3545;
-  }
-  
-  &.p-badge-warning {
-    background-color: #ffc107;
-    color: #212529;
-  }
-  
-  &.p-badge-info {
-    background-color: #17a2b8;
-  }
-  
-  &.p-badge-success {
-    background-color: #28a745;
+// Agregar más tareas de ejemplo para testing
+.task-card:nth-child(odd) {
+  .task-card-content {
+    background: linear-gradient(135deg, #fff, #f8f9fa);
   }
 }
 
-// Scrollbar styling
-.column-content::-webkit-scrollbar {
-  width: 6px;
+.task-card:nth-child(even) {
+  .task-card-content {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  }
 }
-
-.column-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.column-content::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-.column-content::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
 }

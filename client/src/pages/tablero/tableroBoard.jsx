@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
@@ -12,11 +12,12 @@ import { Chip } from 'primereact/chip';
 import { confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { useToast } from '@context/toast/ToastContext';
 import './tableroBoard.scss';
 
 const TableroBoard = () => {
-    const { showToast } = useToast();
+    const toast = useRef(null);
+
+    // Estados principales
     const [tasks, setTasks] = useState({
         backlog: [],
         todo: [],
@@ -28,6 +29,8 @@ const TableroBoard = () => {
     const [showTaskDialog, setShowTaskDialog] = useState(false);
     const [showChangeRequestDialog, setShowChangeRequestDialog] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
+    const [selectedColumn, setSelectedColumn] = useState('backlog'); // ← AGREGAR ESTA LÍNEA
+    
     const [newTask, setNewTask] = useState({
         title: '',
         description: '',
@@ -39,6 +42,7 @@ const TableroBoard = () => {
     });
     
     const [developers, setDevelopers] = useState([]);
+    
     const [categories] = useState([
         { label: 'Frontend', value: 'frontend' },
         { label: 'Backend', value: 'backend' },
@@ -63,13 +67,15 @@ const TableroBoard = () => {
         { id: 'done', title: 'Completado', color: '#28a745' }
     ];
 
+    // Función para mostrar toast
+    const showToast = (severity, summary, detail) => {
+        if (toast.current) {
+            toast.current.show({ severity, summary, detail });
+        }
+    };
+
     const loadTasks = useCallback(async () => {
         try {
-            // Aquí cargarías las tareas desde la API
-            // const response = await fetch('/api/tablero/tasks');
-            // const data = await response.json();
-            // setTasks(data);
-            
             // Datos de ejemplo más llamativos
             setTasks({
                 backlog: [
@@ -96,6 +102,18 @@ const TableroBoard = () => {
                         estimatedHours: 12,
                         createdDate: new Date(),
                         collaborators: []
+                    },
+                    {
+                        id: '6',
+                        title: '📱 Responsive Design',
+                        description: 'Hacer que la aplicación sea responsive para móviles',
+                        assignee: { id: 2, name: 'María García', avatar: 'MG' },
+                        priority: 'medium',
+                        dueDate: new Date('2024-08-25'),
+                        category: 'frontend',
+                        estimatedHours: 10,
+                        createdDate: new Date(),
+                        collaborators: []
                     }
                 ],
                 todo: [
@@ -108,6 +126,18 @@ const TableroBoard = () => {
                         dueDate: new Date('2024-08-10'),
                         category: 'database',
                         estimatedHours: 8,
+                        createdDate: new Date(),
+                        collaborators: []
+                    },
+                    {
+                        id: '7',
+                        title: '🔧 Setup CI/CD',
+                        description: 'Configurar pipelines de integración continua',
+                        assignee: { id: 3, name: 'Carlos López', avatar: 'CL' },
+                        priority: 'high',
+                        dueDate: new Date('2024-08-12'),
+                        category: 'devops',
+                        estimatedHours: 6,
                         createdDate: new Date(),
                         collaborators: []
                     }
@@ -126,7 +156,20 @@ const TableroBoard = () => {
                         collaborators: []
                     }
                 ],
-                review: [],
+                review: [
+                    {
+                        id: '8',
+                        title: '🧪 Testing de componentes',
+                        description: 'Crear tests unitarios para componentes React',
+                        assignee: { id: 2, name: 'María García', avatar: 'MG' },
+                        priority: 'medium',
+                        dueDate: new Date('2024-08-22'),
+                        category: 'testing',
+                        estimatedHours: 14,
+                        createdDate: new Date(),
+                        collaborators: []
+                    }
+                ],
                 done: [
                     {
                         id: '5',
@@ -139,6 +182,18 @@ const TableroBoard = () => {
                         estimatedHours: 4,
                         createdDate: new Date(),
                         collaborators: []
+                    },
+                    {
+                        id: '9',
+                        title: '📚 Documentación base',
+                        description: 'Crear documentación básica del proyecto',
+                        assignee: { id: 1, name: 'Juan Pérez', avatar: 'JP' },
+                        priority: 'low',
+                        dueDate: new Date('2024-08-07'),
+                        category: 'documentation',
+                        estimatedHours: 3,
+                        createdDate: new Date(),
+                        collaborators: []
                     }
                 ]
             });
@@ -146,11 +201,10 @@ const TableroBoard = () => {
             console.error('Error loading tasks:', error);
             showToast('error', 'Error', 'No se pudieron cargar las tareas');
         }
-    }, [showToast]);
+    }, []);
 
     const loadDevelopers = useCallback(async () => {
         try {
-            // Aquí se cargan los desarrolladores desde la API
             setDevelopers([
                 { id: 1, name: 'Juan Pérez', avatar: 'JP', role: 'Frontend Developer' },
                 { id: 2, name: 'María García', avatar: 'MG', role: 'Backend Developer' },
@@ -162,7 +216,6 @@ const TableroBoard = () => {
     }, []);
 
     useEffect(() => {
-        // Indicador visual en consola
         console.log("🎯 TABLERO KANBAN CARGADO EXITOSAMENTE!");
         console.log("📊 Componente TableroBoard renderizado correctamente");
         console.log("✅ Si ves este mensaje, el tablero está funcionando");
@@ -227,15 +280,6 @@ const TableroBoard = () => {
 
     const sendWhatsAppNotification = async (task) => {
         try {
-            // Aquí enviarías la notificación de WhatsApp
-            // const message = `🔄 CAMBIO DE TAREA SOLICITADO\n\nDesarrollador: ${task.assignee?.name}\nTarea: ${task.title}\n\n¿Aprobar el cambio?`;
-            
-            // await fetch('/api/whatsapp/send-notification', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ message, taskId: task.id })
-            // });
-            
             showToast('info', 'Notificación Enviada', 'Se ha notificado al jefe de programadores');
         } catch (error) {
             console.error('Error sending WhatsApp notification:', error);
@@ -244,11 +288,7 @@ const TableroBoard = () => {
 
     const updateTaskStatus = async (taskId, newStatus) => {
         try {
-            // await fetch(`/api/tablero/tasks/${taskId}/status`, {
-            //     method: 'PUT',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ status: newStatus })
-            // });
+            console.log(`Actualizando tarea ${taskId} a estado ${newStatus}`);
         } catch (error) {
             console.error('Error updating task status:', error);
         }
@@ -270,7 +310,7 @@ const TableroBoard = () => {
 
             setTasks(prev => ({
                 ...prev,
-                backlog: [...prev.backlog, task]
+                [selectedColumn]: [...prev[selectedColumn], task]
             }));
 
             setNewTask({
@@ -296,93 +336,79 @@ const TableroBoard = () => {
         return priorityObj?.severity || 'info';
     };
 
-    const TaskCard = ({ task, index }) => (
+    // FUNCIÓN renderTaskCard que faltaba
+    const renderTaskCard = (task, index) => (
         <Draggable key={task.id} draggableId={task.id} index={index}>
             {(provided, snapshot) => (
-                <Card
+                <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     className={`task-card ${snapshot.isDragging ? 'dragging' : ''}`}
-                    style={{
-                        ...provided.draggableProps.style,
-                        marginBottom: '8px'
-                    }}
                 >
-                    <div className="task-header">
-                        <h4>{task.title}</h4>
-                        <Badge 
-                            value={task.priority} 
-                            severity={getPriorityColor(task.priority)} 
-                            size="small" 
-                        />
-                    </div>
-                    
-                    <p className="task-description">{task.description}</p>
-                    
-                    <div className="task-meta">
-                        <Chip label={task.category} className="category-chip" />
-                        <span className="estimated-hours">{task.estimatedHours}h</span>
-                    </div>
-                    
-                    <div className="task-footer">
-                        <div className="assignee">
-                            <Avatar label={task.assignee?.avatar} size="small" />
-                            <span>{task.assignee?.name}</span>
+                    <Card className="task-card-content">
+                        <div className="task-header">
+                            <h4 className="task-title">{task.title}</h4>
+                            <Badge 
+                                value={task.priority} 
+                                severity={getPriorityColor(task.priority)} 
+                                size="small" 
+                            />
                         </div>
-                        {task.dueDate && (
-                            <span className="due-date">
-                                {new Date(task.dueDate).toLocaleDateString()}
-                            </span>
+                        
+                        {task.description && (
+                            <p className="task-description">{task.description}</p>
                         )}
-                    </div>
-                </Card>
+                        
+                        <div className="task-meta">
+                            <Chip label={task.category} className="category-chip" />
+                            <span className="estimated-hours">{task.estimatedHours}h</span>
+                        </div>
+                        
+                        <div className="task-footer">
+                            <div className="assignee">
+                                <Avatar 
+                                    label={task.assignee?.avatar || task.assignee?.name?.substring(0, 2) || 'U'} 
+                                    size="small" 
+                                    style={{ backgroundColor: '#007bff' }}
+                                />
+                                <span>{task.assignee?.name || 'Sin asignar'}</span>
+                            </div>
+                            {task.dueDate && (
+                                <span className="due-date">
+                                    {new Date(task.dueDate).toLocaleDateString()}
+                                </span>
+                            )}
+                        </div>
+                    </Card>
+                </div>
             )}
         </Draggable>
     );
 
     return (
         <div className="tablero-board">
-            {/* Banner de confirmación visual */}
-            <div className="tablero-banner">
-                <div className="banner-content">
-                    <i className="pi pi-check-circle banner-icon"></i>
-                    <div className="banner-text">
-                        <h3>¡Tablero Kanban Funcionando!</h3>
-                        <p>El tablero se está cargando correctamente. Si ves este mensaje, ¡la navegación está funcionando!</p>
-                    </div>
-                </div>
-            </div>
+            <Toast ref={toast} />
             
             <div className="board-header">
-                <div className="header-title">
-                    <i className="pi pi-th-large header-icon"></i>
-                    <h2>Tablero de Desarrollo</h2>
-                    <Badge value="ACTIVO" severity="success" className="status-badge" />
-                </div>
-                <div className="header-actions">
-                    <Button 
-                        icon="pi pi-question-circle" 
-                        label="Guía de Uso" 
-                        className="p-button-outlined p-button-info"
-                        onClick={() => window.open('/tablero-guide', '_blank')}
-                    />
-                    <Button 
-                        icon="pi pi-plus" 
-                        label="Nueva Tarea" 
-                        onClick={() => setShowTaskDialog(true)}
-                    />
-                </div>
+                <h1>
+                    <span role="img" aria-label="tablero">📋</span> Tablero Kanban - PAVAS
+                </h1>
+                <Button 
+                    label="➕ Nueva Tarea" 
+                    className="p-button-success"
+                    onClick={() => {
+                        setSelectedColumn('backlog');
+                        setShowTaskDialog(true);
+                    }}
+                />
             </div>
 
             <DragDropContext onDragEnd={handleDragEnd}>
                 <div className="board-columns">
                     {columns.map(column => (
                         <div key={column.id} className="board-column">
-                            <div 
-                                className="column-header"
-                                style={{ borderColor: column.color }}
-                            >
+                            <div className="column-header" style={{ borderLeftColor: column.color }}>
                                 <h3>{column.title}</h3>
                                 <Badge value={tasks[column.id]?.length || 0} />
                             </div>
@@ -394,9 +420,9 @@ const TableroBoard = () => {
                                         {...provided.droppableProps}
                                         className={`column-content ${snapshot.isDraggingOver ? 'drag-over' : ''}`}
                                     >
-                                        {tasks[column.id]?.map((task, index) => (
-                                            <TaskCard key={task.id} task={task} index={index} />
-                                        ))}
+                                        {tasks[column.id]?.map((task, index) => 
+                                            renderTaskCard(task, index)
+                                        )}
                                         {provided.placeholder}
                                     </div>
                                 )}
@@ -406,7 +432,7 @@ const TableroBoard = () => {
                 </div>
             </DragDropContext>
 
-            {/* Dialog para crear nueva tarea */}
+            {/* Dialog para crear/editar tareas */}
             <Dialog
                 header="Nueva Tarea"
                 visible={showTaskDialog}
@@ -533,8 +559,6 @@ const TableroBoard = () => {
                     />
                 </div>
             </Dialog>
-
-            <Toast ref={showToast} />
         </div>
     );
 };
