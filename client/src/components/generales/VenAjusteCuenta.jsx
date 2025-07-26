@@ -45,6 +45,52 @@ export const VenAjusteCuenta = ({ visible, setVisible }) => {
         const abortController = new AbortController();
 
         if (idusuario > 0) {
+            // ← USAR DATOS MOCK EN LUGAR DE API
+            console.log('📊 Cargando datos mock para desarrollo...');
+            
+            // Simular datos del usuario
+            const mockData = {
+                nombre: "Administrador",
+                apellido: "Sistema", 
+                usuario: "admin@tablero.com",
+                correo: "admin@tablero.com"
+            };
+
+            // ← INTENTAR OBTENER DATOS REALES DEL LOCALSTORAGE
+            try {
+                const storedUser = localStorage.getItem('user');
+                const tableroUser = localStorage.getItem('user_data');
+                
+                if (tableroUser) {
+                    const parsedUser = JSON.parse(tableroUser);
+                    mockData.nombre = parsedUser.nombre || "Administrador";
+                    mockData.correo = parsedUser.correo || "admin@tablero.com";
+                    mockData.usuario = parsedUser.usuario || "admin@tablero.com";
+                    mockData.apellido = parsedUser.apellido || "Sistema";
+                } else if (storedUser) {
+                    const parsedUser = JSON.parse(storedUser);
+                    mockData.nombre = parsedUser.nombre || "Administrador";
+                    mockData.correo = parsedUser.email || parsedUser.correo || "admin@tablero.com";
+                    mockData.usuario = parsedUser.usuario || parsedUser.email || "admin@tablero.com";
+                    mockData.apellido = parsedUser.apellido || "Sistema";
+                }
+            } catch (error) {
+                console.log('⚠️ Error leyendo datos del localStorage, usando defaults');
+            }
+
+            // ← ESTABLECER VALORES EN EL FORMULARIO
+            Object.keys(mockData).forEach((fieldName) => {
+                const fieldExists = getValues(fieldName);
+                if (fieldExists !== undefined) {
+                    setValue(fieldName, mockData[fieldName]);
+                }
+            });
+
+            setOriginalData(mockData);
+            console.log('✅ Datos mock cargados:', mockData);
+
+            // ← COMENTAR LA LLAMADA A API HASTA QUE ESTÉ LISTA
+            /*
             Axios.get("api/auth/get_basic_information", {
                 params: { usuId: idusuario },
                 headers: { ...headers, Authorization: `Bearer ${Cookies.get("tokenPONTO")}` },
@@ -70,6 +116,7 @@ export const VenAjusteCuenta = ({ visible, setVisible }) => {
                     }
                     showError(error);
                 });
+            */
         }
 
         return () => abortController.abort();
@@ -82,9 +129,46 @@ export const VenAjusteCuenta = ({ visible, setVisible }) => {
             usuario === originalData.usuario &&
             correo === originalData.correo
         ) {
-            return showInfo("No has hecho ninguna Actualización");
+            return showInfo("No has hecho ninguna actualización");
         }
 
+        // ← SIMULAR ACTUALIZACIÓN EXITOSA
+        console.log('🔄 Simulando actualización de cuenta...');
+        
+        try {
+            // Simular delay de API
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Actualizar datos mock
+            const newData = { nombre, apellido, usuario, correo };
+            setOriginalData(newData);
+            
+            // Actualizar localStorage si existe
+            try {
+                const storedUserData = localStorage.getItem('user_data');
+                if (storedUserData) {
+                    const updatedUser = {
+                        ...JSON.parse(storedUserData),
+                        nombre,
+                        apellido,
+                        usuario,
+                        correo
+                    };
+                    localStorage.setItem('user_data', JSON.stringify(updatedUser));
+                }
+            } catch (error) {
+                console.log('⚠️ Error actualizando localStorage');
+            }
+            
+            showSuccess("Datos de cuenta actualizados exitosamente (modo desarrollo)");
+            console.log('✅ Datos actualizados:', newData);
+            
+        } catch (error) {
+            showError("Error simulando la actualización");
+        }
+
+        // ← COMENTAR LA LLAMADA A API HASTA QUE ESTÉ LISTA
+        /*
         const params = {
             nombre,
             apellido,
@@ -108,12 +192,13 @@ export const VenAjusteCuenta = ({ visible, setVisible }) => {
             }
             showError(error);
         }
+        */
     };
 
     return (
         <Dialog
             closeOnEscape={false}
-            header="Ajuste Cuenta"
+            header="Ajuste de Cuenta"
             visible={visible}
             onHide={() => {
                 setVisible(false);
@@ -121,32 +206,12 @@ export const VenAjusteCuenta = ({ visible, setVisible }) => {
             }}
             breakpoints={{ "960px": "75vw", "640px": "100vw" }}
             style={{ width: "40vw" }}
-            // footer={
-            //     <div>
-            //         <Button
-            //             className="p-button-danger"
-            //             label="Cerrar"
-            //             icon="pi pi-times"
-            //             onClick={() => {
-            //                 setVisible(false);
-            //                 reset();
-            //             }}
-            //         />
-            //         <Button
-            //             className="p-button-info"
-            //             label="Guardar"
-            //             icon="pi pi-check"
-            //             onClick={handleSubmit(modificarCuenta)}
-            //         />
-            //     </div>
-            // }
         >
             <form onSubmit={handleSubmit(modificarCuenta)}>
                 <div className="grid p-fluid">
-                    <div className="col-12 md:col-6 ">
+                    <div className="col-12 md:col-6">
                         <label>Nombre</label>
                         <InputText
-                            readOnly
                             placeholder="Nombre"
                             className={classNames({ "p-invalid": errors.nombre })}
                             {...register("nombre", { required: "El campo nombre es requerido" })}
@@ -155,10 +220,9 @@ export const VenAjusteCuenta = ({ visible, setVisible }) => {
                             {errors.nombre?.message}
                         </div>
                     </div>
-                    <div className="col-12 md:col-6 ">
+                    <div className="col-12 md:col-6">
                         <label>Apellido</label>
                         <InputText
-                            readOnly
                             placeholder="Apellido"
                             className={classNames({ "p-invalid": errors.apellido })}
                             {...register("apellido")}
@@ -167,7 +231,6 @@ export const VenAjusteCuenta = ({ visible, setVisible }) => {
                     <div className="col-12 md:col-6">
                         <label>Usuario</label>
                         <InputText
-                            readOnly
                             placeholder="Usuario"
                             className={classNames({ "p-invalid": errors.usuario })}
                             {...register("usuario", { required: "El campo usuario es requerido" })}
@@ -179,22 +242,69 @@ export const VenAjusteCuenta = ({ visible, setVisible }) => {
                     <div className="col-12 md:col-6">
                         <label>Correo Electrónico</label>
                         <InputText
-                            readOnly
                             placeholder="Correo"
+                            type="email"
                             className={classNames({ "p-invalid": errors.correo })}
-                            {...register("correo", { required: "El campo correo es requerido" })}
+                            {...register("correo", { 
+                                required: "El campo correo es requerido",
+                                pattern: {
+                                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                    message: "Formato de correo inválido"
+                                }
+                            })}
                         />
                         <div className={classNames({ "p-error": errors.correo })}>
                             {errors.correo?.message}
+                        </div>
+                    </div>
+
+                    {/* ← AGREGAR BOTONES DE ACCIÓN */}
+                    <div className="col-12 mt-3">
+                        <div className="flex justify-content-end gap-2">
+                            <button
+                                type="button"
+                                className="p-button p-component p-button-secondary"
+                                onClick={() => {
+                                    setVisible(false);
+                                    reset();
+                                }}
+                            >
+                                <span className="p-button-icon pi pi-times"></span>
+                                <span className="p-button-label">Cancelar</span>
+                            </button>
+                            <button
+                                type="submit"
+                                className="p-button p-component p-button-primary"
+                            >
+                                <span className="p-button-icon pi pi-check"></span>
+                                <span className="p-button-label">Guardar</span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </form>
 
             <div className="col-12 mt-3">
-                <Accordion activeIndex={0}>
+                <Accordion activeIndex={null}>
                     <AccordionTab header="Cambiar contraseña">
-                        <ActualizarClave />
+                        <div className="p-4 text-center">
+                            <i className="pi pi-lock" style={{ fontSize: '2rem', color: '#007bff', marginBottom: '1rem' }}></i>
+                            <h4>Cambio de contraseña</h4>
+                            <p style={{ color: '#6c757d', marginBottom: '1rem' }}>
+                                Esta funcionalidad estará disponible cuando se implemente el backend completo.
+                            </p>
+                            <div style={{ 
+                                background: '#f8f9fa', 
+                                border: '1px solid #dee2e6', 
+                                borderRadius: '8px', 
+                                padding: '1rem',
+                                fontSize: '0.9rem',
+                                color: '#495057'
+                            }}>
+                                <strong>💡 Para desarrollo:</strong><br />
+                                Por ahora los datos se guardan temporalmente en memoria local.
+                            </div>
+                        </div>
                     </AccordionTab>
                 </Accordion>
             </div>
