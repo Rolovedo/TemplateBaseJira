@@ -8,11 +8,11 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { classNames } from "primereact/utils";
 // OTROS
 import { useForm } from "react-hook-form";
-import Axios from "axios";
+//import Axios from "axios";
 // UTILS
-import { headers } from "@utils/converAndConst";
-import { ActualizarClave } from "./ActualizarClave";
-import Cookies from "js-cookie";
+//import { headers } from "@utils/converAndConst";
+//import { ActualizarClave } from "./ActualizarClave";
+//import Cookies from "js-cookie";
 
 export const VenAjusteCuenta = ({ visible, setVisible }) => {
     const { nombreusuario, idusuario } = useContext(AuthContext);
@@ -301,7 +301,7 @@ export const VenAjusteCuenta = ({ visible, setVisible }) => {
                                 fontSize: '0.9rem',
                                 color: '#495057'
                             }}>
-                                <strong>💡 Para desarrollo:</strong><br />
+                                <strong>Para desarrollo:</strong><br />
                                 Por ahora los datos se guardan temporalmente en memoria local.
                             </div>
                         </div>
