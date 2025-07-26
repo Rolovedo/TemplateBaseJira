@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { AuthContext } from "@context/auth/AuthContext";
 import Cookies from "js-cookie";
@@ -10,28 +10,27 @@ import { useForm } from "react-hook-form";
 // Custom Components
 import { VenCambioClave } from "@components/generales/VenCambioClave";
 import { VentanaRecuperar } from "@components/generales/VentanaRecuperar";
-import LoginForm from "./LoginForm"; // ← IMPORTAR LoginForm
+import LoginForm from "./LoginForm";
 
 // Services
 import authService from '../../services/auth.service';
-
-// Utilities
-import { nameSystem, ruta } from "@utils/converAndConst";
 
 import "./styles/login.css";
 
 const Login = () => {
     const history = useHistory();
     const { login } = useContext(AuthContext);
-    const [visible, setVisible] = useState(false);
+    //const [visible, setVisible] = useState(false);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
     const [loadingLogin, setLoadingLogin] = useState(false);
     const [activeForm, setActiveForm] = useState("login");
+    
+    // ← AGREGAR REF PARA CONTROLAR SI EL COMPONENTE ESTÁ MONTADO
+    const isMountedRef = useRef(true);
 
     const {
         register,
         handleSubmit,
-        setValue,
         formState: { errors },
     } = useForm({
         defaultValues: {
@@ -40,18 +39,34 @@ const Login = () => {
         },
     });
 
+    // ← CLEANUP CUANDO EL COMPONENTE SE DESMONTA
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
+
     const onLoginUser = async ({ usuario, clave }) => {
         console.log('🔐 Iniciando login con Login.jsx...');
+        
+        // ← VERIFICAR SI EL COMPONENTE SIGUE MONTADO
+        if (!isMountedRef.current) return;
+        
         setLoadingLogin(true);
 
         try {
             // Login normal de PONTO
             const data = await login(usuario, clave);
             
+            // ← VERIFICAR DESPUÉS DE OPERACIÓN ASYNC
+            if (!isMountedRef.current) return;
+            
             console.log('📊 Respuesta login:', data);
 
             if (!data) {
-                setLoadingLogin(false);
+                if (isMountedRef.current) {
+                    setLoadingLogin(false);
+                }
                 return;
             }
 
@@ -65,6 +80,9 @@ const Login = () => {
                 console.log('⚠️ Error generando token tablero, usando auth PONTO:', tokenError);
                 authService.useExistingPontoAuth();
             }
+
+            // ← VERIFICAR ANTES DE CONTINUAR
+            if (!isMountedRef.current) return;
 
             // Verificar si hay token en cookies o en la respuesta
             const cookieToken = Cookies.get('token') || Cookies.get('authToken');
@@ -84,17 +102,29 @@ const Login = () => {
             console.log('Token:', localStorage.getItem('token'));
             console.log('User:', localStorage.getItem('user'));
 
+            // ← VERIFICAR ANTES DE ACTUALIZAR ESTADO
+            if (!isMountedRef.current) return;
+
             // Verificar si necesita cambio de contraseña
             if (Number(cambioclave) === 1) {
                 console.log('🔐 Requiere cambio de contraseña');
                 Cookies.set("autentificadoCASAL", false);
-                setShowChangePasswordModal(true);
+                if (isMountedRef.current) {
+                    setShowChangePasswordModal(true);
+                    setLoadingLogin(false);
+                }
+                return;
             } else if (usuId > 0) {
                 console.log('✅ Login exitoso, navegando...');
                 
                 // Guardar autenticación adicional
                 localStorage.setItem('user_authenticated', 'true');
                 localStorage.setItem('user_data', JSON.stringify(data));
+                
+                // ← DETENER LOADING ANTES DE NAVEGAR
+                if (isMountedRef.current) {
+                    setLoadingLogin(false);
+                }
                 
                 // Navegar según perfil
                 if (Number(perfil) === 3) {
@@ -107,6 +137,8 @@ const Login = () => {
                 
                 // Verificación adicional para asegurar navegación
                 setTimeout(() => {
+                    if (!isMountedRef.current) return; // ← VERIFICAR EN TIMEOUT
+                    
                     const currentHash = window.location.hash;
                     if (currentHash.includes('login')) {
                         console.log('🔄 Forzando navegación...');
@@ -114,21 +146,28 @@ const Login = () => {
                         window.location.href = `${window.location.origin}${window.location.pathname}#${targetRoute}`;
                     }
                 }, 1000);
+                
+                return; // ← SALIR TEMPRANO PARA EVITAR ACTUALIZAR LOADING
             }
         } catch (error) {
             console.error('❌ Error en login:', error);
-            // No redirigir automáticamente en caso de error, mostrar mensaje
         } finally {
-            setLoadingLogin(false);
+            // ← SOLO ACTUALIZAR ESTADO SI EL COMPONENTE SIGUE MONTADO
+            if (isMountedRef.current) {
+                setLoadingLogin(false);
+            }
         }
     };
 
     return (
         <>
-            <VentanaRecuperar visible={visible} onClose={() => setVisible(false)} />
             <VenCambioClave
                 visible={showChangePasswordModal}
-                onClose={() => setShowChangePasswordModal(false)}
+                onClose={() => {
+                    if (isMountedRef.current) {
+                        setShowChangePasswordModal(false);
+                    }
+                }}
             />
             <UnauthenticatedSessionControl storageTokenKey="token" />
             
@@ -151,17 +190,19 @@ const Login = () => {
                                         Inicia sesión y sigue creciendo con nosotros.
                                     </p>
                                     
-                                    {/* ← USAR LoginForm COMPONENTE */}
                                     <LoginForm
                                         register={register}
                                         handleSubmit={handleSubmit}
                                         errors={errors}
                                         onLoginUser={onLoginUser}
                                         loading={loadingLogin}
-                                        setActiveForm={setActiveForm}
+                                        setActiveForm={(form) => {
+                                            if (isMountedRef.current) {
+                                                setActiveForm(form);
+                                            }
+                                        }}
                                     />
                                     
-                                    {/* INFORMACIÓN DE PRUEBA */}
                                     <div style={{ 
                                         marginTop: '15px', 
                                         padding: '10px', 
@@ -169,7 +210,9 @@ const Login = () => {
                                         borderRadius: '4px', 
                                         fontSize: '12px' 
                                     }}>
-                                        <strong>🔐 Para probar:</strong><br />
+                                        <strong>
+                                            <span role="img" aria-label="lock">🔐</span> Para probar:
+                                        </strong><br />
                                         <strong>Usuario:</strong> admin@tablero.com<br />
                                         <strong>Contraseña:</strong> admin123<br />
                                     </div>
@@ -179,7 +222,13 @@ const Login = () => {
                             {activeForm === "recover" && (
                                 <>
                                     <h2>Recuperar contraseña</h2>
-                                    <VentanaRecuperar onClose={() => setActiveForm("login")} />
+                                    <VentanaRecuperar 
+                                        onClose={() => {
+                                            if (isMountedRef.current) {
+                                                setActiveForm("login");
+                                            }
+                                        }} 
+                                    />
                                 </>
                             )}
                         </div>
