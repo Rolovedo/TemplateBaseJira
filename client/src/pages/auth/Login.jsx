@@ -1,12 +1,7 @@
 import React, { useContext, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { AuthContext } from "@context/auth/AuthContext";
 import Cookies from "js-cookie";
-
-// PrimeReact Components
-import { InputText } from "primereact/inputtext";
-import { Button } from "primereact/button";
-import { Password } from "primereact/password";
-import { classNames } from "primereact/utils";
 
 // Third-party Libraries
 import { UnauthenticatedSessionControl } from "react-session-control";
@@ -15,6 +10,10 @@ import { useForm } from "react-hook-form";
 // Custom Components
 import { VenCambioClave } from "@components/generales/VenCambioClave";
 import { VentanaRecuperar } from "@components/generales/VentanaRecuperar";
+import LoginForm from "./LoginForm"; // ← IMPORTAR LoginForm
+
+// Services
+import authService from '../../services/auth.service';
 
 // Utilities
 import { nameSystem, ruta } from "@utils/converAndConst";
@@ -22,9 +21,12 @@ import { nameSystem, ruta } from "@utils/converAndConst";
 import "./styles/login.css";
 
 const Login = () => {
+    const history = useHistory();
     const { login } = useContext(AuthContext);
     const [visible, setVisible] = useState(false);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+    const [loadingLogin, setLoadingLogin] = useState(false);
+    const [activeForm, setActiveForm] = useState("login");
 
     const {
         register,
@@ -39,12 +41,31 @@ const Login = () => {
     });
 
     const onLoginUser = async ({ usuario, clave }) => {
+        console.log('🔐 Iniciando login con Login.jsx...');
+        setLoadingLogin(true);
+
         try {
-            console.log('🔐 Iniciando login...');
+            // Login normal de PONTO
+            const data = await login(usuario, clave);
             
-            // Interceptar la respuesta del login
-            const loginResponse = await login(usuario, clave);
-            
+            console.log('📊 Respuesta login:', data);
+
+            if (!data) {
+                setLoadingLogin(false);
+                return;
+            }
+
+            const { cambioclave, usuId, perfil } = data;
+
+            // Generar token para tablero después del login exitoso
+            try {
+                await authService.generateTableroToken(usuario, clave);
+                console.log('✅ Token de tablero generado exitosamente');
+            } catch (tokenError) {
+                console.log('⚠️ Error generando token tablero, usando auth PONTO:', tokenError);
+                authService.useExistingPontoAuth();
+            }
+
             // Verificar si hay token en cookies o en la respuesta
             const cookieToken = Cookies.get('token') || Cookies.get('authToken');
             
@@ -62,16 +83,43 @@ const Login = () => {
             console.log('📋 Verificando localStorage después del login:');
             console.log('Token:', localStorage.getItem('token'));
             console.log('User:', localStorage.getItem('user'));
-            console.log('All keys:', Object.keys(localStorage));
 
-            const cambioclave = Number(localStorage.getItem("cambioclave"));
-            if (cambioclave === 1) {
+            // Verificar si necesita cambio de contraseña
+            if (Number(cambioclave) === 1) {
+                console.log('🔐 Requiere cambio de contraseña');
                 Cookies.set("autentificadoCASAL", false);
                 setShowChangePasswordModal(true);
+            } else if (usuId > 0) {
+                console.log('✅ Login exitoso, navegando...');
+                
+                // Guardar autenticación adicional
+                localStorage.setItem('user_authenticated', 'true');
+                localStorage.setItem('user_data', JSON.stringify(data));
+                
+                // Navegar según perfil
+                if (Number(perfil) === 3) {
+                    console.log('👥 Navegando a patients');
+                    history.push("/patients");
+                } else {
+                    console.log('📊 Navegando a dashboard');
+                    history.push("/dashboard");
+                }
+                
+                // Verificación adicional para asegurar navegación
+                setTimeout(() => {
+                    const currentHash = window.location.hash;
+                    if (currentHash.includes('login')) {
+                        console.log('🔄 Forzando navegación...');
+                        const targetRoute = Number(perfil) === 3 ? "/patients" : "/dashboard";
+                        window.location.href = `${window.location.origin}${window.location.pathname}#${targetRoute}`;
+                    }
+                }, 1000);
             }
         } catch (error) {
             console.error('❌ Error en login:', error);
-            window.location.href = `${ruta}`;
+            // No redirigir automáticamente en caso de error, mostrar mensaje
+        } finally {
+            setLoadingLogin(false);
         }
     };
 
@@ -83,96 +131,81 @@ const Login = () => {
                 onClose={() => setShowChangePasswordModal(false)}
             />
             <UnauthenticatedSessionControl storageTokenKey="token" />
-            <div className="login-body">
-                <div className="login-wrapper">
-                    <div className="login-panel">
-                        <img
-                            src={`${process.env.PUBLIC_URL}/images/logos/logoPavasStay.png`}
-                            className="login-logo"
-                            alt="logo-layout"
-                        />
-                        <form
-                            onSubmit={handleSubmit(onLoginUser)}
-                            noValidate
-                            className="login-form"
-                        >
-                            <div
-                                className="text-center"
-                                style={{ marginBottom: "30px", color: "#eaecec" }}
-                            >
-                                <h2>{nameSystem}</h2>
-                                <h5 style={{ marginTop: "-1px" }}>
-                                    Introduce tus datos para iniciar sesión
-                                </h5>
-                            </div>
-                            <InputText
-                                placeholder="Usuario o Correo Electrónico"
-                                className={`p-inputtext-lg ${classNames({
-                                    "p-invalid": errors.usuario,
-                                })}`}
-                                {...register("usuario", {
-                                    required: "El campo usuario es requerido",
-                                })}
+            
+            <div className="login-wrapper">
+                <div className="login-card">
+                    <div className="login-form-section">
+                        <div className="logos-header">
+                            <img
+                                src={`${process.env.PUBLIC_URL}/images/logos/logoPavasStay.png`}
+                                alt="Logo Cliente"
+                                className="logo-cliente"
                             />
-                            <label className={classNames({ "p-error": errors.usuario })}>
-                                {errors.usuario?.message}
-                            </label>
-                            <Password
-                                placeholder="Contraseña"
-                                feedback={false}
-                                toggleMask={true}
-                                className={`p-inputtext-lg ${classNames({
-                                    "p-invalid": errors.clave,
-                                })}`}
-                                {...register("clave", {
-                                    required: "El campo contraseña es requerido",
-                                    onChange: (e) => setValue("clave", e.target.value),
-                                })}
-                            />
-                            <label className={classNames({ "p-error": errors.clave })}>
-                                {errors.clave?.message}
-                            </label>
-                            <Button
-                                label="Iniciar sesión"
-                                type="submit"
-                                className="p-button-primary p-button-lg"
-                            />
-                        </form>
-                        <img
-                            src={`${process.env.PUBLIC_URL}/images/logos/logoPavasStay.png`}
-                            className="logo"
-                            alt="logo-layout"
-                        />
-                        <p style={{ fontSize: "14px" }}>
-                            ¿Olvidaste tu contraseña?{" "}
-                            <Button
-                                onClick={() => setVisible(true)}
-                                label="Click aquí"
-                                className="p-button-text"
-                                style={{
-                                    fontSize: "14px",
-                                    display: "contents",
-                                    fontWeight: "bold",
-                                }}
-                            />{" "}
-                            para restablecer.
-                        </p>
-                    </div>
-                    <div
-                        className="login-image"
-                        style={{
-                            backgroundImage: `url("${process.env.PUBLIC_URL}/images/bg-login.webp")`,
-                        }}
-                    >
-                        <div className="image-footer">
-                            <p>Desing By PAVAS S.A.S </p>
-                            <div className="icons">
-                                <i
-                                    onClick={() => window.open("https://pavastecnologia.com")}
-                                    className="pi pi-globe"
-                                ></i>
-                            </div>
                         </div>
+
+                        <div className="form-content">
+                            {activeForm === "login" && (
+                                <>
+                                    <h2>Bienvenido de nuevo</h2>
+                                    <p className="description">
+                                        Inicia sesión y sigue creciendo con nosotros.
+                                    </p>
+                                    
+                                    {/* ← USAR LoginForm COMPONENTE */}
+                                    <LoginForm
+                                        register={register}
+                                        handleSubmit={handleSubmit}
+                                        errors={errors}
+                                        onLoginUser={onLoginUser}
+                                        loading={loadingLogin}
+                                        setActiveForm={setActiveForm}
+                                    />
+                                    
+                                    {/* INFORMACIÓN DE PRUEBA */}
+                                    <div style={{ 
+                                        marginTop: '15px', 
+                                        padding: '10px', 
+                                        backgroundColor: '#f8f9fa', 
+                                        borderRadius: '4px', 
+                                        fontSize: '12px' 
+                                    }}>
+                                        <strong>🔐 Para probar:</strong><br />
+                                        <strong>Usuario:</strong> admin@tablero.com<br />
+                                        <strong>Contraseña:</strong> admin123<br />
+                                    </div>
+                                </>
+                            )}
+
+                            {activeForm === "recover" && (
+                                <>
+                                    <h2>Recuperar contraseña</h2>
+                                    <VentanaRecuperar onClose={() => setActiveForm("login")} />
+                                </>
+                            )}
+                        </div>
+
+                        <footer>
+                            <div>© 2025 TODOS LOS DERECHOS RESERVADOS</div>
+                            <img
+                                src={`${process.env.PUBLIC_URL}/images/logos/logoPavasStay.png`}
+                                alt="Desarrollado por"
+                                className="logo-desarrollador-footer"
+                            />
+                        </footer>
+                    </div>
+
+                    <div className="login-image-section">
+                        <div
+                            className="image-inner"
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                backgroundImage: `url(${process.env.PUBLIC_URL}/images/bgDashboard.svg)`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                                borderRadius: "16px",
+                            }}
+                        ></div>
                     </div>
                 </div>
             </div>

@@ -8,7 +8,8 @@ const LoginForm = ({ register, handleSubmit, errors, onLoginUser, loading, setAc
             <input
                 type="text"
                 name="usuario"
-                placeholder="ejemplo@email.com"
+                placeholder="admin@tablero.com"
+                autoComplete="username"
                 {...register("usuario", {
                     required: "El usuario o correo electrónico es obligatorio",
                 })}
@@ -19,7 +20,8 @@ const LoginForm = ({ register, handleSubmit, errors, onLoginUser, loading, setAc
             <input
                 type="password"
                 name="clave"
-                placeholder="**************"
+                placeholder="••••••••"
+                autoComplete="current-password"
                 {...register("clave", {
                     required: "La contraseña es obligatoria",
                 })}
@@ -37,7 +39,7 @@ const LoginForm = ({ register, handleSubmit, errors, onLoginUser, loading, setAc
 
             <Button
                 type="submit"
-                label="Iniciar sesión"
+                label={loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
                 className="btn-login"
                 loading={loading}
                 disabled={loading}

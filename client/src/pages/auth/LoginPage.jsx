@@ -7,7 +7,7 @@ import { VentanaRecuperar } from "@components/generales";
 import { VenCambioClave } from "@components/generales/VenCambioClave";
 import "./styles/login.css";
 import { ruta } from "@utils/converAndConst";
-//port LoginForm from "./LoginForm";
+//import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import OtpVerificationModal from "./OtpVerificationModal";
 import useHandleApiError from "@hook/useHandleApiError";
@@ -184,7 +184,7 @@ const Login = () => {
                                             <p className="description">
                                                 Inicia sesión y sigue creciendo con nosotros.
                                             </p>
-                                            <form onSubmit={onLoginUser} className="login-form">
+                                            <form onSubmit={handleSubmit(onLoginUser)} className="login-form">
                                                 <div className="p-field">
                                                     <label htmlFor="usuario">Usuario o correo electrónico</label>
                                                     <InputText
@@ -200,7 +200,10 @@ const Login = () => {
                                                     <label htmlFor="clave">Contraseña</label>
                                                     <Password
                                                         id="clave"
-                                                        {...register("clave", { required: true })}
+                                                        inputRef={register("clave", { required: true }).ref}
+                                                        name="clave"
+                                                        onChange={(e) => register("clave").onChange(e)}
+                                                        onBlur={register("clave").onBlur}
                                                         placeholder="••••••••"
                                                         className="w-full"
                                                         feedback={false}
