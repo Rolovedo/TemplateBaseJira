@@ -19,6 +19,9 @@ const AppRoutes = () => {
                 {/* Ruta del tablero */}
                 <Route exact path="/tablero" component={TableroBoard} />
                 
+                {/* Nueva ruta para /tablero/board */}
+                <Route exact path="/tablero/board" component={TableroBoard} />
+                
                 {/* Ruta de fallback */}
                 <Route path="*" render={() => <Redirect to="/login" />} />
             </Switch>

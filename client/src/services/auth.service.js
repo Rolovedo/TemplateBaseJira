@@ -200,6 +200,51 @@ class AuthService {
             return false;
         }
     }
+
+    // ← AGREGAR MÉTODO PARA VERIFICAR AUTENTICACIÓN DEL TABLERO
+    isTableroAuthenticated = () => {
+        const tableroToken = localStorage.getItem('tablero_token');
+        const pontoToken = localStorage.getItem('token');
+        const userAuth = localStorage.getItem('user_authenticated');
+        
+        return !!(tableroToken || pontoToken || userAuth === 'true');
+    };
+
+    // ← AGREGAR MÉTODO PARA OBTENER USUARIO DEL TABLERO
+    getTableroUser = () => {
+        try {
+            const tableroUser = localStorage.getItem('tablero_user');
+            if (tableroUser) {
+                return JSON.parse(tableroUser);
+            }
+            
+            const pontoUser = localStorage.getItem('user');
+            if (pontoUser) {
+                return JSON.parse(pontoUser);
+            }
+            
+            return {
+                nombre: 'Usuario Sistema',
+                email: 'usuario@tablero.com'
+            };
+        } catch (error) {
+            return {
+                nombre: 'Usuario Sistema',
+                email: 'usuario@tablero.com'
+            };
+        }
+    };
+
+    // ← MÉTODO PARA DESARROLLO
+    setDevelopmentAuth = () => {
+        console.log('🔧 Estableciendo autenticación de desarrollo...');
+        localStorage.setItem('tablero_token', 'dev_token_' + Date.now());
+        localStorage.setItem('user_authenticated', 'true');
+        localStorage.setItem('tablero_user', JSON.stringify({
+            nombre: 'Desarrollador',
+            email: 'dev@tablero.com'
+        }));
+    };
 }
 
 // Exportar como instancia singleton

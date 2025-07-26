@@ -11,6 +11,7 @@ import { Avatar } from 'primereact/avatar';
 import { Chip } from 'primereact/chip';
 import { Toast } from 'primereact/toast';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import Layout from '@components/layout/Layout'; // ← IMPORTAR LAYOUT
 import authService from '../../services/auth.service';
 import './tableroBoard.scss';
 
@@ -26,7 +27,7 @@ const TableroBoard = () => {
         done: []
     });
 
-    const [developers] = useState([ // Quitar setDevelopers ya que no se usa
+    const [developers] = useState([
         { id: 1, name: 'Juan Pérez', email: 'juan@empresa.com', avatar: 'JP' },
         { id: 2, name: 'María García', email: 'maria@empresa.com', avatar: 'MG' },
         { id: 3, name: 'Carlos López', email: 'carlos@empresa.com', avatar: 'CL' }
@@ -74,7 +75,6 @@ const TableroBoard = () => {
         try {
             console.log('📡 Cargando tareas simuladas...');
             
-            // Datos simulados para desarrollo
             const mockTasks = {
                 backlog: [
                     {
@@ -183,9 +183,7 @@ const TableroBoard = () => {
     const onDragEnd = (result) => {
         const { destination, source, draggableId } = result;
 
-        if (!destination) {
-            return;
-        }
+        if (!destination) return;
 
         if (destination.droppableId === source.droppableId && destination.index === source.index) {
             return;
@@ -291,157 +289,160 @@ const TableroBoard = () => {
         </Draggable>
     );
 
+    // ← ENVOLVER TODO EL CONTENIDO EN EL LAYOUT
     return (
-        <div className="tablero-board">
-            <Toast ref={toast} />
-            
-            <div className="board-header">
-                <h1>
-                    <span role="img" aria-label="tablero">📋</span> Tablero Kanban - PAVAS
-                </h1>
-                <Button 
-                    label="➕ Nueva Tarea" 
-                    className="p-button-success"
-                    onClick={() => {
-                        setSelectedColumn('backlog');
-                        setShowTaskDialog(true);
-                    }}
-                />
-            </div>
+        <Layout>
+            <div className="tablero-board">
+                <Toast ref={toast} />
+                
+                <div className="board-header">
+                    <h1>
+                        <span role="img" aria-label="tablero">📋</span> Tablero Kanban - PAVAS
+                    </h1>
+                    <Button 
+                        label="➕ Nueva Tarea" 
+                        className="p-button-success"
+                        onClick={() => {
+                            setSelectedColumn('backlog');
+                            setShowTaskDialog(true);
+                        }}
+                    />
+                </div>
 
-            <DragDropContext onDragEnd={onDragEnd}>
-                <div className="board-columns">
-                    {columns.map(column => (
-                        <div key={column.id} className="board-column">
-                            <div className="column-header" style={{ borderTopColor: column.color }}>
-                                <h3>{column.title}</h3>
-                                <Badge value={tasks[column.id]?.length || 0} />
+                <DragDropContext onDragEnd={onDragEnd}>
+                    <div className="board-columns">
+                        {columns.map(column => (
+                            <div key={column.id} className="board-column">
+                                <div className="column-header" style={{ borderTopColor: column.color }}>
+                                    <h3>{column.title}</h3>
+                                    <Badge value={tasks[column.id]?.length || 0} />
+                                </div>
+                                
+                                <Droppable droppableId={column.id}>
+                                    {(provided, snapshot) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.droppableProps}
+                                            className={`column-content ${snapshot.isDraggingOver ? 'drag-over' : ''}`}
+                                        >
+                                            {tasks[column.id]?.map((task, index) => 
+                                                renderTaskCard(task, index)
+                                            )}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
                             </div>
-                            
-                            <Droppable droppableId={column.id}>
-                                {(provided, snapshot) => (
-                                    <div
-                                        ref={provided.innerRef}
-                                        {...provided.droppableProps}
-                                        className={`column-content ${snapshot.isDraggingOver ? 'drag-over' : ''}`}
-                                    >
-                                        {tasks[column.id]?.map((task, index) => 
-                                            renderTaskCard(task, index)
-                                        )}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
+                        ))}
+                    </div>
+                </DragDropContext>
+
+                <Dialog
+                    visible={showTaskDialog}
+                    style={{ width: '600px' }}
+                    header={editingTask ? 'Editar Tarea' : 'Nueva Tarea'}
+                    modal
+                    onHide={() => {
+                        setShowTaskDialog(false);
+                        setEditingTask(null);
+                    }}
+                >
+                    <div className="task-form">
+                        <div className="p-field">
+                            <label htmlFor="title">Título *</label>
+                            <InputText
+                                id="title"
+                                value={newTask.title}
+                                onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
+                                placeholder="Ingresa el título de la tarea"
+                            />
                         </div>
-                    ))}
-                </div>
-            </DragDropContext>
 
-            <Dialog
-                visible={showTaskDialog}
-                style={{ width: '600px' }}
-                header={editingTask ? 'Editar Tarea' : 'Nueva Tarea'}
-                modal
-                onHide={() => {
-                    setShowTaskDialog(false);
-                    setEditingTask(null);
-                }}
-            >
-                <div className="task-form">
-                    <div className="p-field">
-                        <label htmlFor="title">Título *</label>
-                        <InputText
-                            id="title"
-                            value={newTask.title}
-                            onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
-                            placeholder="Ingresa el título de la tarea"
-                        />
-                    </div>
+                        <div className="p-field">
+                            <label htmlFor="description">Descripción</label>
+                            <InputTextarea
+                                id="description"
+                                value={newTask.description}
+                                onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
+                                rows={3}
+                                placeholder="Describe la tarea"
+                            />
+                        </div>
 
-                    <div className="p-field">
-                        <label htmlFor="description">Descripción</label>
-                        <InputTextarea
-                            id="description"
-                            value={newTask.description}
-                            onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
-                            rows={3}
-                            placeholder="Describe la tarea"
-                        />
-                    </div>
+                        <div className="p-field">
+                            <label htmlFor="assignee">Asignado a *</label>
+                            <Dropdown
+                                id="assignee"
+                                value={newTask.assignee}
+                                options={developers}
+                                onChange={(e) => setNewTask(prev => ({ ...prev, assignee: e.value }))}
+                                optionLabel="name"
+                                placeholder="Selecciona un desarrollador"
+                            />
+                        </div>
 
-                    <div className="p-field">
-                        <label htmlFor="assignee">Asignado a *</label>
-                        <Dropdown
-                            id="assignee"
-                            value={newTask.assignee}
-                            options={developers}
-                            onChange={(e) => setNewTask(prev => ({ ...prev, assignee: e.value }))}
-                            optionLabel="name"
-                            placeholder="Selecciona un desarrollador"
-                        />
-                    </div>
+                        <div className="p-field">
+                            <label htmlFor="priority">Prioridad</label>
+                            <Dropdown
+                                id="priority"
+                                value={newTask.priority}
+                                options={priorityOptions}
+                                onChange={(e) => setNewTask(prev => ({ ...prev, priority: e.value }))}
+                                optionLabel="label"
+                                placeholder="Selecciona prioridad"
+                            />
+                        </div>
 
-                    <div className="p-field">
-                        <label htmlFor="priority">Prioridad</label>
-                        <Dropdown
-                            id="priority"
-                            value={newTask.priority}
-                            options={priorityOptions}
-                            onChange={(e) => setNewTask(prev => ({ ...prev, priority: e.value }))}
-                            optionLabel="label"
-                            placeholder="Selecciona prioridad"
-                        />
-                    </div>
+                        <div className="p-field">
+                            <label htmlFor="category">Categoría</label>
+                            <Dropdown
+                                id="category"
+                                value={newTask.category}
+                                options={categoryOptions}
+                                onChange={(e) => setNewTask(prev => ({ ...prev, category: e.value }))}
+                                optionLabel="label"
+                                placeholder="Selecciona categoría"
+                            />
+                        </div>
 
-                    <div className="p-field">
-                        <label htmlFor="category">Categoría</label>
-                        <Dropdown
-                            id="category"
-                            value={newTask.category}
-                            options={categoryOptions}
-                            onChange={(e) => setNewTask(prev => ({ ...prev, category: e.value }))}
-                            optionLabel="label"
-                            placeholder="Selecciona categoría"
-                        />
-                    </div>
+                        <div className="p-field">
+                            <label htmlFor="estimatedHours">Horas Estimadas</label>
+                            <InputText
+                                id="estimatedHours"
+                                type="number"
+                                value={newTask.estimatedHours}
+                                onChange={(e) => setNewTask(prev => ({ ...prev, estimatedHours: parseInt(e.target.value) || 0 }))}
+                                placeholder="0"
+                            />
+                        </div>
 
-                    <div className="p-field">
-                        <label htmlFor="estimatedHours">Horas Estimadas</label>
-                        <InputText
-                            id="estimatedHours"
-                            type="number"
-                            value={newTask.estimatedHours}
-                            onChange={(e) => setNewTask(prev => ({ ...prev, estimatedHours: parseInt(e.target.value) || 0 }))}
-                            placeholder="0"
-                        />
-                    </div>
+                        <div className="p-field">
+                            <label htmlFor="dueDate">Fecha de Vencimiento</label>
+                            <Calendar
+                                id="dueDate"
+                                value={newTask.dueDate}
+                                onChange={(e) => setNewTask(prev => ({ ...prev, dueDate: e.value }))}
+                                showIcon
+                                dateFormat="dd/mm/yy"
+                            />
+                        </div>
 
-                    <div className="p-field">
-                        <label htmlFor="dueDate">Fecha de Vencimiento</label>
-                        <Calendar
-                            id="dueDate"
-                            value={newTask.dueDate}
-                            onChange={(e) => setNewTask(prev => ({ ...prev, dueDate: e.value }))}
-                            showIcon
-                            dateFormat="dd/mm/yy"
-                        />
+                        <div className="form-buttons">
+                            <Button 
+                                label="Cancelar" 
+                                className="p-button-secondary"
+                                onClick={() => setShowTaskDialog(false)}
+                            />
+                            <Button 
+                                label={editingTask ? 'Actualizar' : 'Crear Tarea'} 
+                                className="p-button-success"
+                                onClick={createTask}
+                            />
+                        </div>
                     </div>
-
-                    <div className="form-buttons">
-                        <Button 
-                            label="Cancelar" 
-                            className="p-button-secondary"
-                            onClick={() => setShowTaskDialog(false)}
-                        />
-                        <Button 
-                            label={editingTask ? 'Actualizar' : 'Crear Tarea'} 
-                            className="p-button-success"
-                            onClick={createTask}
-                        />
-                    </div>
-                </div>
-            </Dialog>
-        </div>
+                </Dialog>
+            </div>
+        </Layout>
     );
 };
 
