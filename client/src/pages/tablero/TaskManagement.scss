@@ -1,0 +1,240 @@
+.task-management {
+  padding: 20px;
+  
+  .page-header {
+    margin-bottom: 30px;
+    
+    h2 {
+      margin: 0 0 5px 0;
+      color: #495057;
+      font-weight: 600;
+    }
+    
+    p {
+      margin: 0;
+      color: #6c757d;
+      font-size: 14px;
+    }
+  }
+  
+  .toolbar {
+    margin-bottom: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    
+    .toolbar-left {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .toolbar-right {
+      .p-input-icon-left {
+        input {
+          padding-left: 2.5rem;
+        }
+      }
+    }
+  }
+  
+  .task-table {
+    .assignee-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      
+      .assignee-info {
+        .name {
+          font-weight: 600;
+          font-size: 14px;
+          color: #495057;
+        }
+        
+        .role {
+          font-size: 12px;
+          color: #6c757d;
+        }
+      }
+    }
+    
+    .collaborators-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .progress-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      
+      .progress-text {
+        font-size: 12px;
+        color: #6c757d;
+        text-align: center;
+      }
+    }
+    
+    .category-chip {
+      font-size: 11px;
+      padding: 2px 8px;
+      background: #e9ecef;
+      color: #495057;
+      border-radius: 12px;
+    }
+    
+    .overdue {
+      color: #dc3545;
+      font-weight: 600;
+    }
+    
+    .actions-cell {
+      display: flex;
+      gap: 5px;
+    }
+  }
+  
+  .task-form {
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .p-field {
+      margin-bottom: 20px;
+      
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #495057;
+        font-size: 14px;
+      }
+      
+      .p-inputtext,
+      .p-dropdown,
+      .p-calendar,
+      .p-inputtextarea,
+      .p-multiselect {
+        width: 100%;
+      }
+    }
+  }
+  
+  .collaborators-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    
+    .collaborator-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      
+      span {
+        font-weight: 500;
+        color: #495057;
+      }
+    }
+  }
+}
+
+// DataTable custom styles
+.p-datatable {
+  .p-datatable-header {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    padding: 1rem;
+  }
+  
+  .p-datatable-thead > tr > th {
+    background: #f8f9fa;
+    border-color: #dee2e6;
+    color: #495057;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  
+  .p-datatable-tbody > tr > td {
+    border-color: #dee2e6;
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .p-datatable-tbody > tr:hover {
+    background: #f8f9fa;
+  }
+}
+
+// Badge colors
+.p-badge {
+  &.p-badge-danger {
+    background-color: #dc3545;
+  }
+  
+  &.p-badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  &.p-badge-info {
+    background-color: #17a2b8;
+  }
+  
+  &.p-badge-success {
+    background-color: #28a745;
+  }
+}
+
+// Tag colors
+.p-tag {
+  &.p-tag-secondary {
+    background-color: #6c757d;
+  }
+  
+  &.p-tag-info {
+    background-color: #17a2b8;
+  }
+  
+  &.p-tag-warning {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  &.p-tag-success {
+    background-color: #28a745;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .task-management {
+    padding: 10px;
+    
+    .toolbar {
+      .p-toolbar {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+      }
+    }
+    
+    .task-table {
+      font-size: 12px;
+      
+      .assignee-cell {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+    }
+  }
+}

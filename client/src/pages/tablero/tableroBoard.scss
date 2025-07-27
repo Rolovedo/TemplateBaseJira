@@ -1,0 +1,240 @@
+.tablero-board {
+  width: 100%;
+  height: 100vh;
+  overflow: auto;
+  padding: 20px;
+  background: #f8f9fa;
+  min-height: 100vh;
+  
+  .board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e9ecef;
+    
+    h1 {
+      color: #333;
+      margin: 0;
+    }
+  }
+  
+  .board-columns {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    overflow-x: auto;
+    min-height: 70vh;
+    
+    .board-column {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-height: 600px;
+      
+      .column-header {
+        padding: 16px;
+        border-top: 4px solid;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8f9fa;
+        border-radius: 8px 8px 0 0;
+        
+        h3 {
+          margin: 0;
+          color: #333;
+          font-size: 16px;
+        }
+      }
+      
+      .column-content {
+        padding: 16px;
+        min-height: 500px;
+        
+        &.drag-over {
+          background: #e3f2fd;
+        }
+      }
+    }
+  }
+  
+  .task-card {
+    margin-bottom: 12px;
+    
+    &.dragging {
+      transform: rotate(5deg);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+    
+    .task-card-content {
+      cursor: grab;
+      
+      &:active {
+        cursor: grabbing;
+      }
+      
+      .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+        
+        .task-title {
+          margin: 0;
+          color: #333;
+          font-size: 14px;
+          flex: 1;
+        }
+      }
+      
+      .task-description {
+        color: #666;
+        font-size: 12px;
+        margin-bottom: 12px;
+        line-height: 1.4;
+      }
+      
+      .task-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        
+        .task-assignee {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          
+          span {
+            font-size: 12px;
+            color: #666;
+          }
+        }
+        
+        .category-chip {
+          font-size: 10px;
+        }
+      }
+      
+      .task-hours {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #999;
+        font-size: 11px;
+      }
+    }
+  }
+  
+  .task-form {
+    .p-field {
+      margin-bottom: 16px;
+      
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 500;
+        color: #333;
+      }
+    }
+    
+    .form-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+  }
+}
+
+// Animaciones
+@keyframes slideInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .tablero-board {
+    padding: 10px;
+    
+    .board-header {
+      flex-direction: column;
+      gap: 15px;
+      align-items: stretch;
+      
+      .header-actions {
+        justify-content: center;
+      }
+    }
+    
+    .board-columns {
+      flex-direction: column;
+      height: auto;
+      
+      .board-column {
+        flex: none;
+        margin-bottom: 20px;
+      }
+    }
+  }
+}
+
+// Priority colors
+.p-badge {
+  &.p-badge-danger {
+    background-color: #dc3545;
+  }
+  
+  &.p-badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  &.p-badge-info {
+    background-color: #17a2b8;
+  }
+  
+  &.p-badge-success {
+    background-color: #28a745;
+  }
+}
+
+// Scrollbar styling
+.column-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.column-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.column-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.column-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
